@@ -27,6 +27,10 @@ export function Editor({ template }: EditorProps) {
     updateNameFont,
     updateNameColor,
     updateNameSize,
+    nameFontWeight,
+    nameFontStyle,
+    updateNameFontWeight,
+    updateNameFontStyle,
     exportHighRes,
   } = useEditor(template);
 
@@ -48,6 +52,10 @@ export function Editor({ template }: EditorProps) {
           onFontChange={updateNameFont}
           onColorChange={updateNameColor}
           onFontSizeChange={updateNameSize}
+          nameFontWeight={nameFontWeight}
+          nameFontStyle={nameFontStyle}
+          onFontWeightChange={updateNameFontWeight}
+          onFontStyleChange={updateNameFontStyle}
         />
         <main
           ref={containerRef}

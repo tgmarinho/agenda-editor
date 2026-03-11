@@ -15,6 +15,10 @@ interface SidebarProps {
   onFontChange: (font: string) => void;
   onColorChange: (color: string) => void;
   onFontSizeChange: (size: number) => void;
+  nameFontWeight?: string;
+  nameFontStyle?: string;
+  onFontWeightChange?: (weight: string) => void;
+  onFontStyleChange?: (style: string) => void;
 }
 
 export function Sidebar({
@@ -26,6 +30,10 @@ export function Sidebar({
   onFontChange,
   onColorChange,
   onFontSizeChange,
+  nameFontWeight,
+  nameFontStyle,
+  onFontWeightChange,
+  onFontStyleChange,
 }: SidebarProps) {
   return (
     <aside className="w-72 bg-white border-r shadow-sm overflow-y-auto">
@@ -58,6 +66,10 @@ export function Sidebar({
             onFontChange={onFontChange}
             onColorChange={onColorChange}
             onFontSizeChange={onFontSizeChange}
+            nameFontWeight={nameFontWeight}
+            nameFontStyle={nameFontStyle}
+            onFontWeightChange={onFontWeightChange}
+            onFontStyleChange={onFontStyleChange}
           />
         </TabsContent>
         <TabsContent value="image" className="p-4">

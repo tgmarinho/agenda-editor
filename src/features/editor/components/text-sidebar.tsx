@@ -4,14 +4,21 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { Button } from '@/components/ui/button';
+import { Bold, Italic } from 'lucide-react';
 import { DECORATIVE_FONTS } from '@/lib/fonts';
 import { useFontLoader } from '../hooks/use-font-loader';
+import { cn } from '@/lib/utils';
 
 interface TextSidebarProps {
   onNameChange: (name: string) => void;
   onFontChange: (font: string) => void;
   onColorChange: (color: string) => void;
   onFontSizeChange: (size: number) => void;
+  nameFontWeight?: string;
+  nameFontStyle?: string;
+  onFontWeightChange?: (weight: string) => void;
+  onFontStyleChange?: (style: string) => void;
 }
 
 export function TextSidebar({
@@ -19,6 +26,10 @@ export function TextSidebar({
   onFontChange,
   onColorChange,
   onFontSizeChange,
+  nameFontWeight = 'normal',
+  nameFontStyle = 'normal',
+  onFontWeightChange,
+  onFontStyleChange,
 }: TextSidebarProps) {
   const [name, setName] = useState('');
   const [selectedFont, setSelectedFont] = useState('Great Vibes');
@@ -60,6 +71,36 @@ export function TextSidebar({
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
         />
+      </div>
+
+      <div className="space-y-2">
+        <Label>Estilo</Label>
+        <div className="flex gap-2">
+          {onFontWeightChange && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className={cn(nameFontWeight === 'bold' && 'bg-primary/10 border-primary')}
+              onClick={() => onFontWeightChange(nameFontWeight === 'bold' ? 'normal' : 'bold')}
+              title={nameFontWeight === 'bold' ? 'Remover negrito' : 'Negrito'}
+            >
+              <Bold className="w-4 h-4" />
+            </Button>
+          )}
+          {onFontStyleChange && (
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className={cn(nameFontStyle === 'italic' && 'bg-primary/10 border-primary')}
+              onClick={() => onFontStyleChange(nameFontStyle === 'italic' ? 'normal' : 'italic')}
+              title={nameFontStyle === 'italic' ? 'Remover itálico' : 'Itálico'}
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="space-y-2">

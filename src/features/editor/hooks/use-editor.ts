@@ -33,6 +33,8 @@ export function useEditor(template: AgendaTemplate | null) {
   const [canvas, setCanvas] = useState<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [nameObject, setNameObject] = useState<any>(null);
+  const [nameFontWeight, setNameFontWeight] = useState<string>('normal');
+  const [nameFontStyle, setNameFontStyle] = useState<string>('normal');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [logoObject, setLogoObject] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,6 +68,15 @@ export function useEditor(template: AgendaTemplate | null) {
 
     const onObjectChange = () => debouncedPersist();
 
+    const onObjectModified = (e: { target?: { get?: (k: string) => unknown } }) => {
+      const target = e?.target;
+      if (target?.get?.('data') && (target.get('data') as { editorRole?: string })?.editorRole === 'name') {
+        setNameFontWeight((target.get('fontWeight') as string) ?? 'normal');
+        setNameFontStyle((target.get('fontStyle') as string) ?? 'normal');
+      }
+      debouncedPersist();
+    };
+
     // Load template as background (no text overlay from URL)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (fabric as any).Image.fromURL(template.fullImageUrl, (img: any) => {
@@ -79,7 +90,11 @@ export function useEditor(template: AgendaTemplate | null) {
           const objs = fabricCanvas.getObjects();
           const nameObj = objs.find((o: { get: (k: string) => { editorRole?: string } }) => o.get?.('data')?.editorRole === 'name');
           const logoObj = objs.find((o: { get: (k: string) => { editorRole?: string } }) => o.get?.('data')?.editorRole === 'logo');
-          if (nameObj) setNameObject(nameObj);
+          if (nameObj) {
+            setNameObject(nameObj);
+            setNameFontWeight((nameObj.get('fontWeight') as string) ?? 'normal');
+            setNameFontStyle((nameObj.get('fontStyle') as string) ?? 'normal');
+          }
           if (logoObj) setLogoObject(logoObj);
           isRestoringRef.current = false;
           setCanvas(fabricCanvas);
@@ -159,19 +174,21 @@ export function useEditor(template: AgendaTemplate | null) {
         });
         fabricCanvas.add(nameText);
         setNameObject(nameText);
+        setNameFontWeight((nameText.get('fontWeight') as string) ?? 'normal');
+        setNameFontStyle((nameText.get('fontStyle') as string) ?? 'normal');
 
         setCanvas(fabricCanvas);
         setIsLoading(false);
       }
 
-      fabricCanvas.on('object:modified', onObjectChange);
+      fabricCanvas.on('object:modified', onObjectModified);
       fabricCanvas.on('object:added', onObjectChange);
       fabricCanvas.on('object:removed', onObjectChange);
     }, { crossOrigin: 'anonymous' });
 
     return () => {
       debouncedPersist.cancel();
-      fabricCanvas.off('object:modified', onObjectChange);
+      fabricCanvas.off('object:modified', onObjectModified);
       fabricCanvas.off('object:added', onObjectChange);
       fabricCanvas.off('object:removed', onObjectChange);
       fabricCanvas.dispose();
@@ -261,6 +278,20 @@ export function useEditor(template: AgendaTemplate | null) {
     canvas?.renderAll();
   }, [nameObject, canvas]);
 
+  const updateNameFontWeight = useCallback((weight: string) => {
+    if (!nameObject) return;
+    nameObject.set('fontWeight', weight);
+    setNameFontWeight(weight);
+    canvas?.renderAll();
+  }, [nameObject, canvas]);
+
+  const updateNameFontStyle = useCallback((style: string) => {
+    if (!nameObject) return;
+    nameObject.set('fontStyle', style);
+    setNameFontStyle(style);
+    canvas?.renderAll();
+  }, [nameObject, canvas]);
+
   const exportHighRes = useCallback(() => {
     if (!canvas) return;
     const dataUrl = canvas.toDataURL(generateExportOptions());
@@ -291,6 +322,10 @@ export function useEditor(template: AgendaTemplate | null) {
     updateNameFont,
     updateNameColor,
     updateNameSize,
+    nameFontWeight,
+    nameFontStyle,
+    updateNameFontWeight,
+    updateNameFontStyle,
     exportHighRes,
     getPreviewDataUrl,
     clearLocalState,
