@@ -11,9 +11,10 @@ const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 interface ImageSidebarProps {
   onLogoUpload: (url: string) => void;
+  onRemoveLogo?: () => void;
 }
 
-export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
+export function ImageSidebar({ onLogoUpload, onRemoveLogo }: ImageSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -41,6 +42,7 @@ export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
   };
 
   const handleRemove = () => {
+    onRemoveLogo?.();
     setPreview(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };

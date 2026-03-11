@@ -8,6 +8,7 @@ import { Type, Image, Plus, Trash2 } from 'lucide-react';
 
 interface SidebarProps {
   onLogoUpload: (url: string) => void;
+  onRemoveLogo?: () => void;
   onAddText: (text?: string) => void;
   onDeleteSelected: () => void;
   onNameChange: (name: string) => void;
@@ -18,6 +19,7 @@ interface SidebarProps {
 
 export function Sidebar({
   onLogoUpload,
+  onRemoveLogo,
   onAddText,
   onDeleteSelected,
   onNameChange,
@@ -59,7 +61,7 @@ export function Sidebar({
           />
         </TabsContent>
         <TabsContent value="image" className="p-4">
-          <ImageSidebar onLogoUpload={onLogoUpload} />
+          <ImageSidebar onLogoUpload={onLogoUpload} onRemoveLogo={onRemoveLogo} />
         </TabsContent>
       </Tabs>
     </aside>

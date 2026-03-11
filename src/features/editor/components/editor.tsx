@@ -22,6 +22,7 @@ export function Editor({ template }: EditorProps) {
     addLogo,
     addText,
     deleteSelected,
+    removeLogo,
     updateNameText,
     updateNameFont,
     updateNameColor,
@@ -40,6 +41,7 @@ export function Editor({ template }: EditorProps) {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
           onLogoUpload={addLogo}
+          onRemoveLogo={removeLogo}
           onAddText={addText}
           onDeleteSelected={deleteSelected}
           onNameChange={updateNameText}

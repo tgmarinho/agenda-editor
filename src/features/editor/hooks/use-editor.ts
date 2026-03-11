@@ -229,6 +229,14 @@ export function useEditor(template: AgendaTemplate | null) {
     }
   }, [canvas]);
 
+  const removeLogo = useCallback(() => {
+    if (logoObject) {
+      canvas?.remove(logoObject);
+      setLogoObject(null);
+      canvas?.renderAll();
+    }
+  }, [canvas, logoObject]);
+
   const updateNameText = useCallback((text: string) => {
     if (!nameObject) return;
     nameObject.set('text', text);
@@ -278,6 +286,7 @@ export function useEditor(template: AgendaTemplate | null) {
     addLogo,
     addText,
     deleteSelected,
+    removeLogo,
     updateNameText,
     updateNameFont,
     updateNameColor,
