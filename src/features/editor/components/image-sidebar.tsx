@@ -3,7 +3,8 @@
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
-import { Upload, X } from 'lucide-react';
+import { Loader2, Upload, X } from 'lucide-react';
+import { uploadLogo } from '@/lib/supabase/upload-logo';
 
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml'];
 const MAX_SIZE_BYTES = 5 * 1024 * 1024;
@@ -15,8 +16,9 @@ interface ImageSidebarProps {
 export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -25,34 +27,17 @@ export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
       return;
     }
 
-    // Resize client-side before upload (max 2000px)
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = new globalThis.Image();
-      img.onload = () => {
-        const maxSize = 2000;
-        let { width, height } = img;
-        if (width > maxSize || height > maxSize) {
-          if (width > height) {
-            height = (height * maxSize) / width;
-            width = maxSize;
-          } else {
-            width = (width * maxSize) / height;
-            height = maxSize;
-          }
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d')!;
-        ctx.drawImage(img, 0, 0, width, height);
-        const dataUrl = canvas.toDataURL('image/png', 0.9);
-        setPreview(dataUrl);
-        onLogoUpload(dataUrl);
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+    setIsUploading(true);
+    try {
+      const url = await uploadLogo(file);
+      setPreview(url);
+      onLogoUpload(url);
+    } catch {
+      toast.error('Falha no upload');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const handleRemove = () => {
@@ -75,6 +60,7 @@ export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
         accept="image/png,image/jpeg,image/svg+xml"
         onChange={handleFileChange}
         className="hidden"
+        disabled={isUploading}
       />
 
       {preview ? (
@@ -88,7 +74,8 @@ export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
             />
             <button
               onClick={handleRemove}
-              className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-100"
+              disabled={isUploading}
+              className="absolute top-1 right-1 bg-white rounded-full p-1 shadow hover:bg-gray-100 disabled:opacity-50"
             >
               <X className="w-4 h-4" />
             </button>
@@ -97,19 +84,38 @@ export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
             variant="outline"
             size="sm"
             className="w-full"
+            disabled={isUploading}
             onClick={() => fileInputRef.current?.click()}
           >
-            Trocar imagem
+            {isUploading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Enviando…
+              </>
+            ) : (
+              'Trocar imagem'
+            )}
           </Button>
         </div>
       ) : (
         <button
+          type="button"
+          disabled={isUploading}
           onClick={() => fileInputRef.current?.click()}
-          className="w-full border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary hover:bg-primary/5 transition-colors"
+          className="w-full border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary hover:bg-primary/5 transition-colors disabled:opacity-50 disabled:pointer-events-none"
         >
-          <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-          <p className="text-sm text-gray-600">Clique para fazer upload</p>
-          <p className="text-xs text-gray-400 mt-1">PNG, JPG ou SVG. Máximo 5MB.</p>
+          {isUploading ? (
+            <>
+              <Loader2 className="w-8 h-8 mx-auto mb-2 text-gray-400 animate-spin" />
+              <p className="text-sm text-gray-600">Enviando…</p>
+            </>
+          ) : (
+            <>
+              <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+              <p className="text-sm text-gray-600">Clique para fazer upload</p>
+              <p className="text-xs text-gray-400 mt-1">PNG, JPG ou SVG. Máximo 5MB.</p>
+            </>
+          )}
         </button>
       )}
     </div>
