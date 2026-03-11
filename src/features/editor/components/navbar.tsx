@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, ShoppingCart, ArrowLeft, Undo2, Redo2 } from 'lucide-react';
+import { Download, ShoppingCart, ArrowLeft, Undo2, Redo2, Minus, Plus } from 'lucide-react';
 import Link from 'next/link';
 
 interface NavbarProps {
@@ -13,9 +13,25 @@ interface NavbarProps {
   onRedo: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  zoomLevel: number;
+  onZoomIn: () => void;
+  onZoomOut: () => void;
+  onZoomReset: () => void;
 }
 
-export function Navbar({ onExport, templateName, price, onUndo, onRedo, canUndo, canRedo }: NavbarProps) {
+export function Navbar({
+  onExport,
+  templateName,
+  price,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
+  zoomLevel,
+  onZoomIn,
+  onZoomOut,
+  onZoomReset,
+}: NavbarProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'z') {
@@ -48,6 +64,22 @@ export function Navbar({ onExport, templateName, price, onUndo, onRedo, canUndo,
         <span className="text-sm font-medium text-gray-700">{templateName}</span>
       </div>
       <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 border rounded-md px-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onZoomOut} title="Diminuir zoom">
+            <Minus className="w-4 h-4" />
+          </Button>
+          <button
+            type="button"
+            onClick={onZoomReset}
+            className="min-w-14 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded px-2 py-1.5"
+            title="Redefinir para 100%"
+          >
+            {Math.round(zoomLevel * 100)}%
+          </button>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onZoomIn} title="Aumentar zoom">
+            <Plus className="w-4 h-4" />
+          </Button>
+        </div>
         <Button variant="outline" size="sm" onClick={onUndo} disabled={!canUndo} title="Desfazer (Ctrl+Z)">
           <Undo2 className="w-4 h-4" />
         </Button>

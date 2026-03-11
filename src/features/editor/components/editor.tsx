@@ -34,6 +34,10 @@ export function Editor({ template }: EditorProps) {
     updateNameFontWeight,
     updateNameFontStyle,
     exportHighRes,
+    zoomLevel,
+    zoomIn,
+    zoomOut,
+    zoomReset,
   } = useEditor(template);
   const { undo, redo, canUndo, canRedo, saveState } = useHistory(canvas);
 
@@ -50,6 +54,25 @@ export function Editor({ template }: EditorProps) {
     };
   }, [canvas, saveState]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+      const target = e.target as Node;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        (target instanceof HTMLElement && target.isContentEditable)
+      ) {
+        return;
+      }
+      if (!canvas?.getActiveObject()) return;
+      e.preventDefault();
+      deleteSelected();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canvas, deleteSelected]);
+
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <StepIndicator currentStep={1} />
@@ -61,6 +84,10 @@ export function Editor({ template }: EditorProps) {
         onRedo={redo}
         canUndo={canUndo}
         canRedo={canRedo}
+        zoomLevel={zoomLevel}
+        onZoomIn={zoomIn}
+        onZoomOut={zoomOut}
+        onZoomReset={zoomReset}
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar

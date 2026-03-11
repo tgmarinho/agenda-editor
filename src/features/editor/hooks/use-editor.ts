@@ -38,7 +38,25 @@ export function useEditor(template: AgendaTemplate | null) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [logoObject, setLogoObject] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [hasSelection, setHasSelection] = useState(false);
   const isRestoringRef = useRef(false);
+
+  const ZOOM_MIN = 0.25;
+  const ZOOM_MAX = 3;
+  const ZOOM_STEP = 1.2;
+
+  const zoomIn = useCallback(() => {
+    setZoomLevel((prev) => Math.min(ZOOM_MAX, prev * ZOOM_STEP));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setZoomLevel((prev) => Math.max(ZOOM_MIN, prev / ZOOM_STEP));
+  }, []);
+
+  const zoomReset = useCallback(() => {
+    setZoomLevel(1);
+  }, []);
 
   const initCanvas = useCallback(async () => {
     if (!canvasRef.current || !template) return;
@@ -67,6 +85,11 @@ export function useEditor(template: AgendaTemplate | null) {
     }, PERSIST_DEBOUNCE_MS);
 
     const onObjectChange = () => debouncedPersist();
+
+    const onSelectionCreated = () => setHasSelection(true);
+    const onSelectionCleared = () => setHasSelection(false);
+    fabricCanvas.on('selection:created', onSelectionCreated);
+    fabricCanvas.on('selection:cleared', onSelectionCleared);
 
     const onObjectModified = (e: { target?: { get?: (k: string) => unknown } }) => {
       const target = e?.target;
@@ -188,6 +211,8 @@ export function useEditor(template: AgendaTemplate | null) {
 
     return () => {
       debouncedPersist.cancel();
+      fabricCanvas.off('selection:created', onSelectionCreated);
+      fabricCanvas.off('selection:cleared', onSelectionCleared);
       fabricCanvas.off('object:modified', onObjectModified);
       fabricCanvas.off('object:added', onObjectChange);
       fabricCanvas.off('object:removed', onObjectChange);
@@ -198,6 +223,12 @@ export function useEditor(template: AgendaTemplate | null) {
   useEffect(() => {
     initCanvas();
   }, [initCanvas]);
+
+  useEffect(() => {
+    if (!canvas) return;
+    canvas.setZoom(zoomLevel);
+    canvas.renderAll();
+  }, [canvas, zoomLevel]);
 
   const addLogo = useCallback(async (imageUrl: string) => {
     if (!canvas || !template) return;
@@ -242,6 +273,24 @@ export function useEditor(template: AgendaTemplate | null) {
     const active = canvas.getActiveObject();
     if (active) {
       canvas.remove(active);
+      canvas.renderAll();
+    }
+  }, [canvas]);
+
+  const bringToFront = useCallback(() => {
+    if (!canvas) return;
+    const o = canvas.getActiveObject();
+    if (o) {
+      canvas.bringObjectToFront(o);
+      canvas.renderAll();
+    }
+  }, [canvas]);
+
+  const sendToBack = useCallback(() => {
+    if (!canvas) return;
+    const o = canvas.getActiveObject();
+    if (o) {
+      canvas.sendObjectToBack(o);
       canvas.renderAll();
     }
   }, [canvas]);
@@ -314,9 +363,12 @@ export function useEditor(template: AgendaTemplate | null) {
     canvasRef,
     canvas,
     isLoading,
+    hasSelection,
     addLogo,
     addText,
     deleteSelected,
+    bringToFront,
+    sendToBack,
     removeLogo,
     updateNameText,
     updateNameFont,
@@ -329,5 +381,9 @@ export function useEditor(template: AgendaTemplate | null) {
     exportHighRes,
     getPreviewDataUrl,
     clearLocalState,
+    zoomLevel,
+    zoomIn,
+    zoomOut,
+    zoomReset,
   };
 }
