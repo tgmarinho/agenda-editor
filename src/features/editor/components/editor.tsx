@@ -19,6 +19,8 @@ export function Editor({ template }: EditorProps) {
     canvasRef,
     isLoading,
     addLogo,
+    addText,
+    deleteSelected,
     updateNameText,
     updateNameFont,
     updateNameColor,
@@ -36,6 +38,8 @@ export function Editor({ template }: EditorProps) {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
           onLogoUpload={addLogo}
+          onAddText={addText}
+          onDeleteSelected={deleteSelected}
           onNameChange={updateNameText}
           onFontChange={updateNameFont}
           onColorChange={updateNameColor}

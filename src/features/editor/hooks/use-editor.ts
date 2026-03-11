@@ -3,6 +3,8 @@ import { type AgendaTemplate } from '@/types/template';
 import { generateExportOptions, downloadFile } from '../utils';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from '../types';
 
+const CURRENT_YEAR = new Date().getFullYear().toString();
+
 export function useEditor(template: AgendaTemplate | null) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,7 +27,7 @@ export function useEditor(template: AgendaTemplate | null) {
       preserveObjectStacking: true,
     });
 
-    // Load template as background
+    // Load template as background (no text overlay from URL)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (fabric as any).Image.fromURL(template.fullImageUrl, (img: any) => {
       img.scaleToWidth(CANVAS_WIDTH);
@@ -33,8 +35,33 @@ export function useEditor(template: AgendaTemplate | null) {
       fabricCanvas.setBackgroundImage(img, fabricCanvas.renderAll.bind(fabricCanvas));
     }, { crossOrigin: 'anonymous' });
 
-    // Add name text with suggested position
     const { namePosition } = template.suggestedLayout;
+
+    // "Agenda" text — above the name
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const agendaText = new (fabric as any).IText('Agenda', {
+      left: namePosition.x,
+      top: namePosition.y - 110,
+      fontFamily: namePosition.fontFamily,
+      fontSize: Math.round(namePosition.fontSize * 0.55),
+      fill: namePosition.color,
+      editable: true,
+    });
+    fabricCanvas.add(agendaText);
+
+    // Year text — between "Agenda" and name
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const yearText = new (fabric as any).IText(CURRENT_YEAR, {
+      left: namePosition.x,
+      top: namePosition.y - 60,
+      fontFamily: namePosition.fontFamily,
+      fontSize: Math.round(namePosition.fontSize * 0.45),
+      fill: namePosition.color,
+      editable: true,
+    });
+    fabricCanvas.add(yearText);
+
+    // Name text
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const nameText = new (fabric as any).IText('Seu Nome', {
       left: namePosition.x,
@@ -77,6 +104,33 @@ export function useEditor(template: AgendaTemplate | null) {
     }, { crossOrigin: 'anonymous' });
   }, [canvas, template, logoObject]);
 
+  const addText = useCallback(async (text = 'Novo Texto') => {
+    if (!canvas) return;
+    const { fabric } = await import('fabric');
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const newText = new (fabric as any).IText(text, {
+      left: CANVAS_WIDTH / 2 - 80,
+      top: CANVAS_HEIGHT / 2,
+      fontFamily: 'Montserrat',
+      fontSize: 32,
+      fill: '#ffffff',
+      editable: true,
+    });
+    canvas.add(newText);
+    canvas.setActiveObject(newText);
+    canvas.renderAll();
+  }, [canvas]);
+
+  const deleteSelected = useCallback(() => {
+    if (!canvas) return;
+    const active = canvas.getActiveObject();
+    if (active) {
+      canvas.remove(active);
+      canvas.renderAll();
+    }
+  }, [canvas]);
+
   const updateNameText = useCallback((text: string) => {
     if (!nameObject) return;
     nameObject.set('text', text);
@@ -118,6 +172,8 @@ export function useEditor(template: AgendaTemplate | null) {
     canvas,
     isLoading,
     addLogo,
+    addText,
+    deleteSelected,
     updateNameText,
     updateNameFont,
     updateNameColor,
