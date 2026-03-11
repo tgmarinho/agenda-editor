@@ -90,16 +90,28 @@ export function useEditor(template: AgendaTemplate | null) {
       if (savedState) {
         try {
           const parsed = JSON.parse(savedState) as { version?: string; objects?: unknown[] };
-          const loadJson = Array.isArray(parsed.objects)
-            ? { version: parsed.version ?? '5.3.0', objects: parsed.objects }
-            : parsed;
+          const hasValidObjects = Array.isArray(parsed.objects);
+          if (!hasValidObjects) {
+            addDefaultTexts();
+            return;
+          }
+          const loadJson = { version: parsed.version ?? '5.3.0', objects: parsed.objects };
           isRestoringRef.current = true;
+
+          const RESTORE_TIMEOUT_MS = 5000;
+          const restoreTimeoutId = setTimeout(() => {
+            if (!isRestoringRef.current) return;
+            isRestoringRef.current = false;
+            setCanvas(fabricCanvas);
+            setIsLoading(false);
+          }, RESTORE_TIMEOUT_MS);
+
           fabricCanvas.loadFromJSON(loadJson, () => {
+            clearTimeout(restoreTimeoutId);
             reapplyBackgroundAndFinish();
           });
         } catch {
           isRestoringRef.current = false;
-          // fallback: create default content
           addDefaultTexts();
         }
       } else {
