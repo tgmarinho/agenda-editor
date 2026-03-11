@@ -21,9 +21,12 @@ export function Editor({ template }: EditorProps) {
     canvasRef,
     canvas,
     isLoading,
+    hasSelection,
     addLogo,
     addText,
     deleteSelected,
+    bringToFront,
+    sendToBack,
     removeLogo,
     updateNameText,
     updateNameFont,
@@ -95,6 +98,9 @@ export function Editor({ template }: EditorProps) {
           onRemoveLogo={removeLogo}
           onAddText={addText}
           onDeleteSelected={deleteSelected}
+          onBringToFront={bringToFront}
+          onSendToBack={sendToBack}
+          hasSelection={hasSelection}
           onNameChange={updateNameText}
           onFontChange={updateNameFont}
           onColorChange={updateNameColor}
