@@ -353,6 +353,16 @@ export function useEditor(template: AgendaTemplate | null) {
     return canvas.toDataURL({ format: 'png', quality: 0.8 });
   }, [canvas]);
 
+  const getExportDataUrl = useCallback(() => {
+    if (!canvas) return null;
+    return canvas.toDataURL(generateExportOptions());
+  }, [canvas]);
+
+  const getEditorState = useCallback(() => {
+    if (!canvas) return null;
+    return canvas.toJSON();
+  }, [canvas]);
+
   const clearLocalState = useCallback((templateId?: string) => {
     if (typeof window === 'undefined') return;
     const id = templateId ?? template?.id;
@@ -380,6 +390,8 @@ export function useEditor(template: AgendaTemplate | null) {
     updateNameFontStyle,
     exportHighRes,
     getPreviewDataUrl,
+    getExportDataUrl,
+    getEditorState,
     clearLocalState,
     zoomLevel,
     zoomIn,

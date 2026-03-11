@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { type AgendaTemplate } from '@/types/template';
 import { useEditor } from '../hooks/use-editor';
 import { useHistory } from '../hooks/use-history';
@@ -9,6 +9,10 @@ import { Sidebar } from './sidebar';
 import { Navbar } from './navbar';
 import { StepIndicator } from './step-indicator';
 import { Loader2 } from 'lucide-react';
+import { trpc } from '@/lib/trpc';
+import { dataUrlToBlob } from '../utils';
+import { uploadExportPng } from '@/lib/supabase/upload-export';
+import { toast } from 'sonner';
 
 interface EditorProps {
   template: AgendaTemplate;
@@ -16,7 +20,10 @@ interface EditorProps {
 
 export function Editor({ template }: EditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [savedDesignId, setSavedDesignId] = useState<string | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const { fontsLoaded } = useFontLoader();
+  const saveDesign = trpc.design.save.useMutation();
   const {
     canvasRef,
     canvas,
@@ -37,12 +44,63 @@ export function Editor({ template }: EditorProps) {
     updateNameFontWeight,
     updateNameFontStyle,
     exportHighRes,
+    getExportDataUrl,
+    getEditorState,
     zoomLevel,
     zoomIn,
     zoomOut,
     zoomReset,
   } = useEditor(template);
   const { undo, redo, canUndo, canRedo, saveState } = useHistory(canvas);
+
+  const handleLogoUpload = useCallback(
+    (url: string) => {
+      setLogoUrl(url);
+      addLogo(url);
+    },
+    [addLogo]
+  );
+
+  const handleRemoveLogo = useCallback(() => {
+    setLogoUrl(null);
+    removeLogo();
+  }, [removeLogo]);
+
+  const onSave = useCallback(async (): Promise<string | null> => {
+    const dataUrl = getExportDataUrl();
+    if (!dataUrl) {
+      toast.error('Não foi possível gerar a imagem do design.');
+      return null;
+    }
+    const blob = dataUrlToBlob(dataUrl);
+    const filename = savedDesignId ? `design-${savedDesignId}.png` : `design-${Date.now()}.png`;
+    let urlExport: string;
+    try {
+      urlExport = await uploadExportPng(blob, filename);
+    } catch {
+      toast.error('Falha no upload da imagem.');
+      return null;
+    }
+    const editorState = getEditorState();
+    if (!editorState) {
+      toast.error('Estado do editor indisponível.');
+      return null;
+    }
+    try {
+      const res = await saveDesign.mutateAsync({
+        templateId: template.id,
+        editorState,
+        userImageUrl: logoUrl ?? undefined,
+        exportImageUrl: urlExport,
+      });
+      setSavedDesignId(res.id);
+      toast.success('Design salvo');
+      return res.id;
+    } catch {
+      toast.error('Falha ao salvar o design.');
+      return null;
+    }
+  }, [getExportDataUrl, getEditorState, logoUrl, savedDesignId, saveDesign, template.id]);
 
   useEffect(() => {
     if (!canvas || !saveState) return;
@@ -91,11 +149,13 @@ export function Editor({ template }: EditorProps) {
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
         onZoomReset={zoomReset}
+        onSave={onSave}
+        savedDesignId={savedDesignId}
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
-          onLogoUpload={addLogo}
-          onRemoveLogo={removeLogo}
+          onLogoUpload={handleLogoUpload}
+          onRemoveLogo={handleRemoveLogo}
           onAddText={addText}
           onDeleteSelected={deleteSelected}
           onBringToFront={bringToFront}

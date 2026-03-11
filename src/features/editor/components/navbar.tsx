@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, ShoppingCart, ArrowLeft, Undo2, Redo2, Minus, Plus } from 'lucide-react';
+import { Download, ShoppingCart, ArrowLeft, Undo2, Redo2, Minus, Plus, Save } from 'lucide-react';
 import Link from 'next/link';
 
 interface NavbarProps {
@@ -17,6 +17,8 @@ interface NavbarProps {
   onZoomIn: () => void;
   onZoomOut: () => void;
   onZoomReset: () => void;
+  onSave?: () => Promise<string | null>;
+  savedDesignId?: string | null;
 }
 
 export function Navbar({
@@ -31,7 +33,21 @@ export function Navbar({
   onZoomIn,
   onZoomOut,
   onZoomReset,
+  onSave,
+  savedDesignId = null,
 }: NavbarProps) {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!onSave) return;
+    setIsSaving(true);
+    try {
+      await onSave();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === 'z') {
@@ -90,6 +106,23 @@ export function Navbar({
           <Download className="w-4 h-4 mr-1" />
           Exportar PNG
         </Button>
+        {onSave && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            {isSaving ? (
+              <>Salvando…</>
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-1" />
+                Salvar Design
+              </>
+            )}
+          </Button>
+        )}
         <Button size="sm" className="bg-primary text-white">
           <ShoppingCart className="w-4 h-4 mr-1" />
           Comprar {priceFormatted}
