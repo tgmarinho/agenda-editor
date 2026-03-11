@@ -4,11 +4,19 @@ import { useState } from 'react';
 import { trpc } from '@/lib/trpc';
 import { TemplateGrid } from '@/components/templates/template-grid';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { TEMPLATE_CATEGORIES, type AgendaTemplate } from '@/types/template';
+import { AlertCircle } from 'lucide-react';
 
 export default function TemplatesPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const { data: templates, isLoading } = trpc.template.list.useQuery(
+  const {
+    data: templates,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = trpc.template.list.useQuery(
     selectedCategory ? { category: selectedCategory } : undefined
   );
 
@@ -42,8 +50,33 @@ export default function TemplatesPage() {
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="aspect-[2/3] bg-gray-200 rounded-lg animate-pulse" />
+            <div
+              key={i}
+              className="aspect-[2/3] bg-gray-200 rounded-lg animate-pulse"
+              aria-hidden
+            />
           ))}
+        </div>
+      ) : isError ? (
+        <div
+          className="rounded-xl border border-rose-200 bg-rose-50/80 p-8 text-center"
+          role="alert"
+          aria-live="polite"
+        >
+          <AlertCircle className="mx-auto h-12 w-12 text-rose-500 mb-4" aria-hidden />
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            Não foi possível carregar os templates
+          </h2>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            {error?.message ?? 'Verifique sua conexão ou tente novamente em instantes.'}
+          </p>
+          <Button
+            onClick={() => refetch()}
+            variant="default"
+            className="bg-rose-500 hover:bg-rose-600 text-white"
+          >
+            Tentar novamente
+          </Button>
         </div>
       ) : (
         <TemplateGrid templates={(templates ?? []) as unknown as AgendaTemplate[]} />
