@@ -2,7 +2,7 @@ export interface AgendaTemplate {
   id: string;
   name: string;
   slug: string;
-  category: 'feminina' | 'masculina' | 'profissional' | 'elegante';
+  category: 'feminina' | 'masculina' | 'profissional' | 'elegante' | 'natureza';
   thumbnailUrl: string;
   fullImageUrl: string;
   suggestedLayout: {
@@ -29,4 +29,5 @@ export const TEMPLATE_CATEGORIES = [
   { value: 'masculina', label: 'Masculina' },
   { value: 'profissional', label: 'Profissional' },
   { value: 'elegante', label: 'Elegante' },
+  { value: 'natureza', label: 'Natureza' },
 ] as const;
