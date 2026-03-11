@@ -6,6 +6,7 @@ import { useEditor } from '../hooks/use-editor';
 import { useFontLoader } from '../hooks/use-font-loader';
 import { Sidebar } from './sidebar';
 import { Navbar } from './navbar';
+import { StepIndicator } from './step-indicator';
 import { Loader2 } from 'lucide-react';
 
 interface EditorProps {
@@ -30,6 +31,7 @@ export function Editor({ template }: EditorProps) {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
+      <StepIndicator currentStep={1} />
       <Navbar
         onExport={exportHighRes}
         templateName={template.name}
