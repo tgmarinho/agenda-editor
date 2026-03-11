@@ -4,26 +4,42 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { TextSidebar } from './text-sidebar';
 import { ImageSidebar } from './image-sidebar';
-import { Type, Image, Plus, Trash2 } from 'lucide-react';
+import { Type, Image, Plus, Trash2, ArrowUpToLine, ArrowDownToLine } from 'lucide-react';
 
 interface SidebarProps {
   onLogoUpload: (url: string) => void;
+  onRemoveLogo?: () => void;
   onAddText: (text?: string) => void;
   onDeleteSelected: () => void;
+  onBringToFront?: () => void;
+  onSendToBack?: () => void;
+  hasSelection?: boolean;
   onNameChange: (name: string) => void;
   onFontChange: (font: string) => void;
   onColorChange: (color: string) => void;
   onFontSizeChange: (size: number) => void;
+  nameFontWeight?: string;
+  nameFontStyle?: string;
+  onFontWeightChange?: (weight: string) => void;
+  onFontStyleChange?: (style: string) => void;
 }
 
 export function Sidebar({
   onLogoUpload,
+  onRemoveLogo,
   onAddText,
   onDeleteSelected,
+  onBringToFront,
+  onSendToBack,
+  hasSelection = false,
   onNameChange,
   onFontChange,
   onColorChange,
   onFontSizeChange,
+  nameFontWeight,
+  nameFontStyle,
+  onFontWeightChange,
+  onFontStyleChange,
 }: SidebarProps) {
   return (
     <aside className="w-72 bg-white border-r shadow-sm overflow-y-auto">
@@ -48,6 +64,30 @@ export function Sidebar({
               <Trash2 className="w-4 h-4" />
             </Button>
           </div>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1"
+              onClick={onBringToFront}
+              disabled={!hasSelection}
+              title="Trazer para frente"
+            >
+              <ArrowUpToLine className="w-4 h-4 mr-1" />
+              Frente
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1"
+              onClick={onSendToBack}
+              disabled={!hasSelection}
+              title="Enviar para trás"
+            >
+              <ArrowDownToLine className="w-4 h-4 mr-1" />
+              Trás
+            </Button>
+          </div>
           <p className="text-xs text-gray-400">
             Clique duplo em qualquer texto para editar. Selecione e pressione Delete ou use o botão acima para remover.
           </p>
@@ -56,10 +96,14 @@ export function Sidebar({
             onFontChange={onFontChange}
             onColorChange={onColorChange}
             onFontSizeChange={onFontSizeChange}
+            nameFontWeight={nameFontWeight}
+            nameFontStyle={nameFontStyle}
+            onFontWeightChange={onFontWeightChange}
+            onFontStyleChange={onFontStyleChange}
           />
         </TabsContent>
         <TabsContent value="image" className="p-4">
-          <ImageSidebar onLogoUpload={onLogoUpload} />
+          <ImageSidebar onLogoUpload={onLogoUpload} onRemoveLogo={onRemoveLogo} />
         </TabsContent>
       </Tabs>
     </aside>

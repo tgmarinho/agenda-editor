@@ -47,9 +47,9 @@
 
 ---
 
-## Sprint 2 — Editor de Capa (Fabric.js) 🔄 Em andamento
+## Sprint 2 — Editor de Capa (Fabric.js) ✅ Concluído
 
-> Semana 2–3. Base criada; faltam integrações e polish do editor.
+> Semana 2–3. Editor de capa com persistência, upload de logo, controles e salvamento implementados.
 
 ### Concluído
 - [x] Estrutura base do componente Editor — `M`
@@ -57,55 +57,37 @@
 - [x] Sidebar de texto (fonte, cor, tamanho) — `M`
 - [x] Sidebar de imagem (logo upload, redimensionar) — `M`
 - [x] Export PNG base — `M`
+- [x] Página de catálogo de templates `/templates` com grid de cards — `M`
+- [x] Filtro por categoria no catálogo (Femininas, Masculinas, Profissionais, Elegantes) — `S`
+- [x] Card de template com preview, nome e botão "Personalizar" — `S`
+- [x] Navegação: clicar no template redireciona para `/editor/[slug]` — `S`
+- [x] Carregar template selecionado como background bloqueado no canvas ao abrir editor — `M`
+- [x] Persistir canvas JSON no localStorage a cada alteração — `S`
+- [x] Restaurar estado do canvas ao recarregar a página (localStorage) — `M`
+- [x] Indicador de progresso das 4 etapas visível no topo do editor — `S`
+- [x] Botão de upload de logo na sidebar — `S`
+- [x] Validação de tipo de arquivo (PNG, JPG, SVG) e tamanho máximo 5MB — `S`
+- [x] Upload do logo para Supabase Storage — `M`
+- [x] Adicionar logo ao canvas como `fabric.Image` draggable/resizable/rotatable — `M`
+- [x] Controles de transformação visíveis (handles de redimensionamento) — `S`
+- [x] Botão para remover logo do canvas — `S`
+- [x] Texto padrão ao canvas ao carregar template ("Seu Nome") — `S`
+- [x] Edição inline do texto ao clicar duas vezes — `S`
+- [x] Seletor de fonte na sidebar com preview visual — `M`
+- [x] Color picker para cor do texto — `S`
+- [x] Controle de tamanho do texto (slider ou input numérico) — `S`
+- [x] Controle de negrito e itálico — `S`
+- [x] Botões Desfazer / Refazer com atalhos Ctrl+Z / Ctrl+Y — `S`
+- [x] Botão de zoom: aumentar/diminuir e reset — `M`
+- [x] Ordem de camadas: trazer para frente / enviar para trás — `S`
+- [x] Tecla Delete para remover elemento selecionado — `S`
+- [x] Botão "Salvar Design" — salva JSON do canvas via tRPC `design.save` — `M`
+- [x] Botão "Exportar PNG" — gera PNG 2480×3508px e faz download — `M`
+- [x] Ao salvar design, armazenar `exportImageUrl` no Storage do Supabase — `M`
+- [x] Botão "Próximo" habilita apenas após template selecionado e nome preenchido — `S`
 
-### Pendente
-
-#### Catálogo e Seleção de Template
-- [ ] Criar página de catálogo de templates `/templates` com grid de cards — `M`
-  - Dependência: Router tRPC `template.list` já existe
-- [ ] Implementar filtro por categoria no catálogo (Femininas, Masculinas, Profissionais, Elegantes) — `S`
-- [ ] Criar card de template com preview, nome e botão "Personalizar" — `S`
-- [ ] Navegação: clicar no template redireciona para `/editor?templateId=xxx` — `S`
-
-#### Editor — Carregamento e Estado
-- [ ] Carregar template selecionado como background bloqueado no canvas ao abrir editor — `M`
-  - Dependência: `templateId` via query param
-- [ ] Persistir canvas JSON no `useEditorStore` ao cada alteração — `S`
-- [ ] Restaurar estado do canvas ao recarregar a página (localStorage temporário) — `M`
-- [ ] Indicador de progresso das 4 etapas visível no topo do editor — `S`
-
-#### Editor — Upload de Logo
-- [ ] Botão de upload de logo na sidebar — `S`
-- [ ] Validação de tipo de arquivo (PNG, JPG, SVG) e tamanho máximo 5MB — `S`
-- [ ] Upload do logo para Supabase Storage — `M`
-- [ ] Adicionar logo ao canvas como `fabric.Image` draggable/resizable/rotatable — `M`
-- [ ] Controles de transformação visíveis (handles de redimensionamento) — `S`
-- [ ] Botão para remover logo do canvas — `S`
-
-#### Editor — Texto do Nome
-- [ ] Adicionar texto padrão ao canvas ao carregar template ("Seu nome aqui") — `S`
-- [ ] Edição inline do texto ao clicar duas vezes — `S`
-- [ ] Seletor de fonte na sidebar com preview visual — `M`
-- [ ] Color picker para cor do texto — `S`
-- [ ] Controle de tamanho do texto (slider ou input numérico) — `S`
-- [ ] Controle de negrito e itálico — `S`
-
-#### Editor — Controles Gerais
-- [ ] Botões Desfazer / Refazer com atalhos Ctrl+Z / Ctrl+Y — `S`
-  - Dependência: `use-history.ts` já implementado
-- [ ] Botão de zoom: aumentar/diminuir (ou scroll do mouse) — `M`
+### Pendente (opcional / polish)
 - [ ] Botão "Centralizar" para logo e texto — `S`
-- [ ] Ordem de camadas: trazer para frente / enviar para trás — `S`
-- [ ] Tecla Delete para remover elemento selecionado — `S`
-
-#### Exportação e Salvamento
-- [ ] Botão "Salvar Design" — salva JSON do canvas via tRPC `design.save` — `M`
-- [ ] Botão "Exportar PNG" — gera PNG 2480×3508px e faz download — `M`
-  - Verificar qualidade e resolução com teste de impressão
-- [ ] Ao salvar design, armazenar `exportedImageUrl` no Storage do Supabase — `M`
-- [ ] Botão "Próximo" habilita apenas após template selecionado e nome preenchido — `S`
-
-#### Testes e Validação (Sprint 2)
 - [ ] Testar critério de aceite 3: upload de logo, posicionamento, fonte, cor — `M`
 - [ ] Testar critério de aceite 4: verificar resolução do PNG exportado (2480×3508px) — `S`
 
