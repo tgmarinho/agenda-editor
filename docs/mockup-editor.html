@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda Personalizada - Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script:wght@400;700&family=Playfair+Display:wght@400;700&family=Lora:wght@400;600&family=Montserrat:wght@300;400;600&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #0f0f13;
+    color: #e2e8f0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ===== NAVBAR ===== */
+  .navbar {
+    height: 56px;
+    background: #1a1a24;
+    border-bottom: 1px solid #2d2d3d;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    flex-shrink: 0;
+    z-index: 100;
+  }
+
+  .navbar-left { display: flex; align-items: center; gap: 12px; }
+  .navbar-center { display: flex; align-items: center; gap: 8px; }
+  .navbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .logo { font-family: 'Playfair Display', serif; font-size: 18px; color: #c8a960; font-weight: 700; }
+  .logo span { color: #e2e8f0; font-weight: 300; }
+
+  .step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .step.active { background: #c8a960; color: #0f0f13; }
+  .step.done { background: #2d3748; color: #68d391; }
+  .step.pending { background: #1e1e2e; color: #4a5568; border: 1px solid #2d2d3d; }
+
+  .step-arrow { color: #4a5568; font-size: 14px; }
+
+  .btn {
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.3px;
+  }
+
+  .btn-ghost { background: transparent; color: #94a3b8; border: 1px solid #2d2d3d; }
+  .btn-ghost:hover { background: #1e1e2e; color: #e2e8f0; }
+  .btn-secondary { background: #2d2d3d; color: #e2e8f0; }
+  .btn-secondary:hover { background: #3d3d4d; }
+  .btn-gold { background: #c8a960; color: #0f0f13; }
+  .btn-gold:hover { background: #d4b870; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(200,169,96,0.3); }
+  .btn-outline-gold { background: transparent; color: #c8a960; border: 1px solid #c8a960; }
+  .btn-outline-gold:hover { background: rgba(200,169,96,0.1); }
+
+  .icon-btn {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    transition: all 0.15s;
+    font-size: 16px;
+  }
+  .icon-btn:hover { background: #2d2d3d; color: #e2e8f0; }
+
+  /* ===== MAIN LAYOUT ===== */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ===== SIDEBAR ICONS (esquerda extrema) ===== */
+  .sidebar-icons {
+    width: 56px;
+    background: #1a1a24;
+    border-right: 1px solid #2d2d3d;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-icon {
+    width: 44px; height: 44px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    gap: 3px;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .sidebar-icon svg { width: 20px; height: 20px; }
+  .sidebar-icon:hover { background: #2d2d3d; color: #94a3b8; }
+  .sidebar-icon.active { background: #2d2d3d; color: #c8a960; }
+
+  .sidebar-icon .icon-emoji { font-size: 18px; }
+
+  /* ===== PANEL (painel de opções) ===== */
+  .panel {
+    width: 280px;
+    background: #13131d;
+    border-right: 1px solid #2d2d3d;
+    overflow-y: auto;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-header {
+    padding: 16px;
+    border-bottom: 1px solid #2d2d3d;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    flex-shrink: 0;
+  }
+
+  .panel-section {
+    padding: 16px;
+    border-bottom: 1px solid #1e1e2e;
+  }
+
+  .panel-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+  }
+
+  /* Template Grid */
+  .template-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .template-card {
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .template-card:hover { border-color: #c8a960; transform: scale(1.02); }
+  .template-card.selected { border-color: #c8a960; }
+  .template-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 4px; right: 4px;
+    width: 18px; height: 18px;
+    background: #c8a960;
+    color: #0f0f13;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .template-thumb {
+    width: 100%;
+    aspect-ratio: 7/10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    text-align: center;
+    padding: 8px;
+    font-weight: 500;
+  }
+
+  .t1 { background: linear-gradient(135deg, #1a0a0a 0%, #3d1515 40%, #6b2424 100%); color: #f4c2c2; }
+  .t2 { background: linear-gradient(160deg, #0a1628 0%, #1e3a5f 50%, #2d5a8e 100%); color: #bfd4f0; }
+  .t3 { background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0f0f0f 100%); color: #c8a960; }
+  .t4 { background: linear-gradient(135deg, #0a1a0a 0%, #1a3d1a 50%, #2d5e2d 100%); color: #a8d4a8; }
+  .t5 { background: linear-gradient(135deg, #1a0f1a 0%, #3d1a4a 50%, #6b2d7a 100%); color: #dba8f0; }
+  .t6 { background: linear-gradient(135deg, #f5f0e8 0%, #e8ddc8 50%, #d4c9a8 100%); color: #4a3728; }
+
+  .template-name {
+    padding: 5px 6px;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: center;
+    color: #94a3b8;
+    background: #1a1a24;
+    letter-spacing: 0.3px;
+  }
+
+  /* Fontes */
+  .font-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .font-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1.5px solid #2d2d3d;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .font-item:hover { border-color: #4a4a5a; background: #1e1e2e; }
+  .font-item.selected { border-color: #c8a960; background: rgba(200,169,96,0.08); }
+
+  .font-preview { font-size: 18px; color: #e2e8f0; }
+  .font-name-label { font-size: 10px; color: #64748b; font-family: 'Montserrat', sans-serif; }
+
+  /* Color Swatches */
+  .color-swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .swatch {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .swatch:hover { transform: scale(1.15); }
+  .swatch.selected { border-color: #fff; box-shadow: 0 0 0 2px #c8a960; }
+
+  .swatch-gold { background: #c8a960; }
+  .swatch-white { background: #ffffff; border-color: #3d3d4d !important; }
+  .swatch-black { background: #1a1a1a; border-color: #3d3d4d !important; }
+  .swatch-pink { background: #e87fa0; }
+  .swatch-blue { background: #4a90d9; }
+  .swatch-red { background: #e05252; }
+  .swatch-custom { background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); }
+
+  /* Size Slider */
+  .size-slider-wrap { display: flex; align-items: center; gap: 10px; }
+
+  .size-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: #2d2d3d;
+    outline: none;
+  }
+
+  .size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: #c8a960;
+    cursor: pointer;
+  }
+
+  .size-value {
+    font-size: 12px;
+    color: #94a3b8;
+    min-width: 30px;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  /* Upload area */
+  .upload-area {
+    border: 2px dashed #3d3d4d;
+    border-radius: 10px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .upload-area:hover { border-color: #c8a960; background: rgba(200,169,96,0.04); }
+  .upload-icon { font-size: 28px; margin-bottom: 8px; }
+  .upload-text { font-size: 12px; color: #64748b; line-height: 1.5; }
+  .upload-text strong { color: #c8a960; }
+
+  .upload-preview {
+    background: #1e1e2e;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .upload-preview-img {
+    width: 44px; height: 44px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #2d2d3d, #1a1a2e);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .upload-preview-info { flex: 1; }
+  .upload-preview-name { font-size: 11px; color: #e2e8f0; font-weight: 600; }
+  .upload-preview-size { font-size: 10px; color: #64748b; margin-top: 2px; }
+
+  .upload-actions { display: flex; gap: 6px; margin-top: 10px; }
+
+  /* Text Input */
+  .text-input {
+    width: 100%;
+    background: #1e1e2e;
+    border: 1.5px solid #2d2d3d;
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #e2e8f0;
+    font-family: 'Great Vibes', cursive;
+    font-size: 20px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .text-input:focus { border-color: #c8a960; }
+  .text-input::placeholder { color: #4a5568; }
+
+  /* ===== CANVAS AREA ===== */
+  .canvas-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0a0a12;
+    background-image: radial-gradient(circle at 50% 50%, #12121e 0%, #0a0a12 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .canvas-bg-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, #2d2d3d 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.3;
+  }
+
+  /* Zoom controls */
+  .zoom-controls {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #1a1a24;
+    border: 1px solid #2d2d3d;
+    border-radius: 10px;
+    padding: 6px 12px;
+  }
+
+  .zoom-text { font-size: 12px; color: #94a3b8; font-weight: 600; min-width: 36px; text-align: center; }
+
+  /* ===== AGENDA CANVAS ===== */
+  .agenda-canvas {
+    width: 340px;
+    height: 480px;
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+    cursor: default;
+    flex-shrink: 0;
+  }
+
+  /* Template: Floral Marsalla */
+  .agenda-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(160deg, #1a0505 0%, #3d1010 30%, #2a0808 60%, #1a0505 100%);
+  }
+
+  /* Decorações florais */
+  .floral-top-left {
+    position: absolute;
+    top: -10px; left: -10px;
+    width: 160px; height: 160px;
+    background: radial-gradient(ellipse at 20% 20%, rgba(180,60,60,0.4), transparent 70%);
+    filter: blur(2px);
+  }
+
+  .floral-bottom-right {
+    position: absolute;
+    bottom: -10px; right: -10px;
+    width: 180px; height: 180px;
+    background: radial-gradient(ellipse at 80% 80%, rgba(180,60,60,0.35), transparent 70%);
+    filter: blur(2px);
+  }
+
+  /* SVG flores decorativas */
+  .flowers-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0.85;
+  }
+
+  /* Texto fixo do template */
+  .agenda-fixed-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .agenda-year {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 6px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .agenda-title-fixed {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: rgba(200,169,96,0.6);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* Elementos draggáveis do usuário */
+  .draggable {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    transition: box-shadow 0.15s;
+  }
+
+  .draggable:hover .drag-handle { opacity: 1; }
+
+  .draggable.selected {
+    outline: 2px dashed rgba(200,169,96,0.8);
+    outline-offset: 4px;
+  }
+
+  .drag-handle {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #c8a960;
+    color: #0f0f13;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.15s;
+    white-space: nowrap;
+    pointer-events: none;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.5px;
+  }
+
+  .draggable.selected .drag-handle { opacity: 1; }
+
+  /* Resize handles */
+  .resize-handles {
+    position: absolute;
+    inset: -6px;
+    pointer-events: none;
+    display: none;
+  }
+
+  .draggable.selected .resize-handles { display: block; }
+
+  .resize-handle {
+    position: absolute;
+    width: 10px; height: 10px;
+    background: white;
+    border: 2px solid #c8a960;
+    border-radius: 2px;
+    pointer-events: all;
+    cursor: nw-resize;
+  }
+
+  .resize-handle.tl { top: 0; left: 0; cursor: nw-resize; }
+  .resize-handle.tr { top: 0; right: 0; cursor: ne-resize; }
+  .resize-handle.bl { bottom: 0; left: 0; cursor: sw-resize; }
+  .resize-handle.br { bottom: 0; right: 0; cursor: se-resize; }
+  .resize-handle.tm { top: 0; left: 50%; transform: translateX(-50%); cursor: n-resize; }
+  .resize-handle.bm { bottom: 0; left: 50%; transform: translateX(-50%); cursor: s-resize; }
+  .resize-handle.ml { top: 50%; left: 0; transform: translateY(-50%); cursor: w-resize; }
+  .resize-handle.mr { top: 50%; right: 0; transform: translateY(-50%); cursor: e-resize; }
+
+  /* Logo do usuário */
+  .user-logo {
+    width: 72px; height: 72px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  /* Nome do usuário */
+  .user-name {
+    font-family: 'Great Vibes', cursive;
+    font-size: 36px;
+    color: #c8a960;
+    white-space: nowrap;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    line-height: 1.2;
+  }
+
+  /* ===== TOOLBAR CONTEXTUAL ===== */
+  .toolbar {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a1a24;
+    border: 1px solid #2d2d3d;
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    z-index: 50;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .toolbar.visible { opacity: 1; }
+
+  .toolbar-sep {
+    width: 1px;
+    height: 20px;
+    background: #2d2d3d;
+  }
+
+  .toolbar-label { font-size: 11px; color: #64748b; font-weight: 600; }
+
+  .toolbar-font-select {
+    background: #0f0f13;
+    border: 1px solid #3d3d4d;
+    color: #e2e8f0;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .toolbar-color-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #c8a960;
+    border: 2px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+  }
+
+  .toolbar-size-input {
+    width: 44px;
+    background: #0f0f13;
+    border: 1px solid #3d3d4d;
+    color: #e2e8f0;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    text-align: center;
+    outline: none;
+  }
+
+  /* ===== PAINEL DIREITO (info) ===== */
+  .info-panel {
+    width: 220px;
+    background: #13131d;
+    border-left: 1px solid #2d2d3d;
+    padding: 16px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+  }
+
+  .info-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 10px;
+  }
+
+  .layer-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+
+  .layer-item:hover { background: #1e1e2e; color: #e2e8f0; }
+  .layer-item.active { background: rgba(200,169,96,0.1); color: #c8a960; border: 1px solid rgba(200,169,96,0.2); }
+
+  .layer-icon { font-size: 14px; }
+  .layer-lock { font-size: 12px; color: #4a5568; margin-left: auto; }
+
+  .prop-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #1e1e2e;
+  }
+
+  .prop-label { font-size: 11px; color: #64748b; }
+
+  .prop-value {
+    font-size: 11px;
+    color: #e2e8f0;
+    font-weight: 600;
+    background: #1e1e2e;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  /* Progress bar */
+  .progress-wrap { background: #1e1e2e; border-radius: 10px; height: 6px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 10px; background: linear-gradient(90deg, #c8a960, #e4c87a); width: 35%; }
+
+  .progress-label { display: flex; justify-content: space-between; font-size: 11px; color: #64748b; margin-top: 6px; }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #1a1a24;
+    border: 1px solid #2d2d3d;
+    border-left: 3px solid #c8a960;
+    border-radius: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #e2e8f0;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    max-width: 280px;
+  }
+
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast-title { font-weight: 700; margin-bottom: 3px; color: #c8a960; }
+  .toast-msg { font-size: 12px; color: #94a3b8; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2d2d3d; border-radius: 2px; }
+
+  /* Badge */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .badge-gold { background: rgba(200,169,96,0.15); color: #c8a960; border: 1px solid rgba(200,169,96,0.3); }
+  .badge-green { background: rgba(104,211,145,0.15); color: #68d391; border: 1px solid rgba(104,211,145,0.3); }
+
+  /* Divider */
+  .divider { height: 1px; background: #1e1e2e; margin: 4px 0; }
+
+  /* Animate pulse for logo placeholder */
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  .pulse { animation: pulse 2s infinite; }
+
+  /* Floral decorations */
+  .petal {
+    position: absolute;
+    border-radius: 50% 0 50% 0;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-left">
+    <div class="logo">Agenda<span>Studio</span></div>
+  </div>
+
+  <div class="navbar-center">
+    <div class="step-indicator">
+      <div class="step active">① Capa</div>
+      <div class="step-arrow">→</div>
+      <div class="step pending">② Miolo</div>
+      <div class="step-arrow">→</div>
+      <div class="step pending">③ Preview</div>
+      <div class="step-arrow">→</div>
+      <div class="step pending">④ Comprar</div>
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <button class="icon-btn" title="Desfazer" onclick="showToast('Ação desfeita', 'Ctrl+Z')">↩</button>
+    <button class="icon-btn" title="Refazer" onclick="showToast('Ação refeita', 'Ctrl+Y')">↪</button>
+    <div style="width:1px;height:20px;background:#2d2d3d;margin:0 4px"></div>
+    <button class="btn btn-ghost" onclick="showToast('Salvo!', 'Design salvo automaticamente')">💾 Salvar</button>
+    <button class="btn btn-outline-gold" onclick="showToast('Gerando preview...', 'Abrindo visualização 3D da agenda')">👁 Preview 3D</button>
+    <button class="btn btn-gold" onclick="showToast('Avançando!', 'Indo para configuração do miolo')">Próxima etapa →</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- SIDEBAR ICONS -->
+  <div class="sidebar-icons">
+    <div class="sidebar-icon active" onclick="switchPanel('templates')" id="icon-templates" title="Templates">
+      <div class="icon-emoji">🎨</div>
+      <div>Tema</div>
+    </div>
+    <div class="sidebar-icon" onclick="switchPanel('text')" id="icon-text" title="Texto">
+      <div class="icon-emoji">✍️</div>
+      <div>Texto</div>
+    </div>
+    <div class="sidebar-icon" onclick="switchPanel('logo')" id="icon-logo" title="Logo">
+      <div class="icon-emoji">🖼️</div>
+      <div>Logo</div>
+    </div>
+    <div class="sidebar-icon" onclick="switchPanel('fonts')" id="icon-fonts" title="Fontes">
+      <div class="icon-emoji">Aa</div>
+      <div>Fonte</div>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div class="panel">
+
+    <!-- PANEL: TEMPLATES -->
+    <div id="panel-templates">
+      <div class="panel-header">Escolha o Template</div>
+
+      <div class="panel-section">
+        <div class="panel-label">Femininas</div>
+        <div class="template-grid">
+          <div class="template-card selected" onclick="selectTemplate(this, 'marsalla')">
+            <div class="template-thumb t1">
+              🌹<br><small style="font-family:'Playfair Display',serif;font-size:11px;margin-top:4px;display:block;color:#f4c2c2;letter-spacing:1px">FLORAL<br>MARSALLA</small>
+            </div>
+            <div class="template-name">Marsalla</div>
+          </div>
+          <div class="template-card" onclick="selectTemplate(this, 'delicadeza')">
+            <div class="template-thumb t5">
+              🪷<br><small style="font-family:'Playfair Display',serif;font-size:11px;margin-top:4px;display:block;color:#dba8f0;letter-spacing:1px">DELICADEZA</small>
+            </div>
+            <div class="template-name">Delicadeza</div>
+          </div>
+          <div class="template-card" onclick="selectTemplate(this, 'rosa')">
+            <div class="template-thumb" style="background:linear-gradient(135deg,#2d0a1a,#6b1a3a);color:#f4b8c8;">
+              🌸<br><small style="font-family:'Playfair Display',serif;font-size:11px;margin-top:4px;display:block;letter-spacing:1px">RED ROSES</small>
+            </div>
+            <div class="template-name">Red Roses</div>
+          </div>
+          <div class="template-card" onclick="selectTemplate(this, 'azul')">
+            <div class="template-thumb t2">
+              💙<br><small style="font-family:'Playfair Display',serif;font-size:11px;margin-top:4px;display:block;color:#bfd4f0;letter-spacing:1px">FLORAL AZUL</small>
+            </div>
+            <div class="template-name">Floral Azul</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Elegantes</div>
+        <div class="template-grid">
+          <div class="template-card" onclick="selectTemplate(this, 'elegante')">
+            <div class="template-thumb t3">
+              ✨<br><small style="font-family:'Playfair Display',serif;font-size:11px;margin-top:4px;display:block;color:#c8a960;letter-spacing:1px">OURO &<br>PRETO</small>
+            </div>
+            <div class="template-name">Ouro & Preto</div>
+          </div>
+          <div class="template-card" onclick="selectTemplate(this, 'marmore')">
+            <div class="template-thumb t6">
+              🪨<br><small style="font-family:'Playfair Display',serif;font-size:11px;margin-top:4px;display:block;color:#4a3728;letter-spacing:1px">MARMORARIA</small>
+            </div>
+            <div class="template-name">Marmoraria</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Profissionais</div>
+        <div class="template-grid">
+          <div class="template-card" onclick="selectTemplate(this, 'juridica')">
+            <div class="template-thumb" style="background:linear-gradient(135deg,#050a1a,#0a1a3d);color:#8ab4f8;">
+              ⚖️<br><small style="font-family:'Playfair Display',serif;font-size:11px;margin-top:4px;display:block;letter-spacing:1px">JURÍDICA</small>
+            </div>
+            <div class="template-name">Jurídica</div>
+          </div>
+          <div class="template-card" onclick="selectTemplate(this, 'classica')">
+            <div class="template-thumb t4">
+              📋<br><small style="font-family:'Playfair Display',serif;font-size:11px;margin-top:4px;display:block;color:#a8d4a8;letter-spacing:1px">CLÁSSICA</small>
+            </div>
+            <div class="template-name">Clássica</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: TEXTO -->
+    <div id="panel-text" style="display:none">
+      <div class="panel-header">Nome na Capa</div>
+
+      <div class="panel-section">
+        <div class="panel-label">Digite seu nome</div>
+        <input
+          class="text-input"
+          id="name-input"
+          type="text"
+          placeholder="Seu nome aqui..."
+          value="Karen Viegas"
+          oninput="updateName(this.value)"
+        />
+        <div style="font-size:10px;color:#4a5568;margin-top:6px;">Duplo clique na capa para editar diretamente</div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Tamanho da fonte</div>
+        <div class="size-slider-wrap">
+          <span style="font-size:11px;color:#64748b">A</span>
+          <input type="range" class="size-slider" min="20" max="72" value="38" id="font-size-slider" oninput="updateFontSize(this.value)">
+          <span class="size-value" id="font-size-value">38</span>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Cor do nome</div>
+        <div class="color-swatches">
+          <div class="swatch swatch-gold selected" onclick="selectColor(this, '#c8a960')" title="Dourado"></div>
+          <div class="swatch swatch-white" onclick="selectColor(this, '#ffffff')" title="Branco"></div>
+          <div class="swatch swatch-pink" onclick="selectColor(this, '#e87fa0')" title="Rosa"></div>
+          <div class="swatch swatch-blue" onclick="selectColor(this, '#4a90d9')" title="Azul"></div>
+          <div class="swatch swatch-red" onclick="selectColor(this, '#e05252')" title="Vermelho"></div>
+          <div class="swatch swatch-black" onclick="selectColor(this, '#1a1a1a')" title="Preto"></div>
+          <div class="swatch swatch-custom" onclick="showToast('Color picker', 'Escolha qualquer cor')" title="Personalizado"></div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Alinhamento</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-secondary" style="flex:1;font-size:16px;padding:6px" onclick="showToast('Alinhamento', 'Esquerda')">⬅</button>
+          <button class="btn btn-gold" style="flex:1;font-size:16px;padding:6px" onclick="showToast('Alinhamento', 'Centro')">↔</button>
+          <button class="btn btn-secondary" style="flex:1;font-size:16px;padding:6px" onclick="showToast('Alinhamento', 'Direita')">➡</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: LOGO -->
+    <div id="panel-logo" style="display:none">
+      <div class="panel-header">Logo / Imagem</div>
+
+      <div class="panel-section">
+        <div class="panel-label">Upload do logo</div>
+
+        <!-- Estado: com logo carregado -->
+        <div class="upload-preview" id="logo-loaded">
+          <div class="upload-preview-img">⚕️</div>
+          <div class="upload-preview-info">
+            <div class="upload-preview-name">logo-medico.png</div>
+            <div class="upload-preview-size">142 KB · PNG</div>
+          </div>
+        </div>
+        <div class="upload-actions">
+          <button class="btn btn-secondary" style="flex:1;font-size:11px" onclick="showToast('Upload', 'Selecione uma nova imagem')">🔄 Trocar</button>
+          <button class="btn btn-ghost" style="font-size:11px" onclick="removeLogo()">✕</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Tamanho</div>
+        <div class="size-slider-wrap">
+          <span style="font-size:11px;color:#64748b">↔</span>
+          <input type="range" class="size-slider" min="40" max="200" value="72" id="logo-size-slider" oninput="updateLogoSize(this.value)">
+          <span class="size-value" id="logo-size-value">72</span>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Forma</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-gold" style="flex:1;font-size:11px;padding:6px" onclick="showToast('Forma', 'Circular')">⭕ Círculo</button>
+          <button class="btn btn-secondary" style="flex:1;font-size:11px;padding:6px" onclick="showToast('Forma', 'Quadrada')">⬛ Quadrado</button>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Opacidade</div>
+        <div class="size-slider-wrap">
+          <input type="range" class="size-slider" min="20" max="100" value="100" oninput="showToast('Opacidade', this.value + '%')">
+          <span class="size-value">100%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: FONTES -->
+    <div id="panel-fonts" style="display:none">
+      <div class="panel-header">Estilo de Fonte</div>
+
+      <div class="panel-section">
+        <div class="panel-label">Script (caligrafia)</div>
+        <div class="font-list">
+          <div class="font-item selected" onclick="selectFont(this, 'Great Vibes')">
+            <div class="font-preview" style="font-family:'Great Vibes',cursive">Karen Viegas</div>
+            <div class="font-name-label">Great Vibes</div>
+          </div>
+          <div class="font-item" onclick="selectFont(this, 'Dancing Script')">
+            <div class="font-preview" style="font-family:'Dancing Script',cursive">Karen Viegas</div>
+            <div class="font-name-label">Dancing Script</div>
+          </div>
+          <div class="font-item" onclick="selectFont(this, 'Satisfy')">
+            <div class="font-preview" style="font-family:'Satisfy',cursive;font-size:15px">Karen Viegas</div>
+            <div class="font-name-label">Satisfy</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Serifadas</div>
+        <div class="font-list">
+          <div class="font-item" onclick="selectFont(this, 'Playfair Display')">
+            <div class="font-preview" style="font-family:'Playfair Display',serif;font-size:15px">Karen Viegas</div>
+            <div class="font-name-label">Playfair Display</div>
+          </div>
+          <div class="font-item" onclick="selectFont(this, 'Lora')">
+            <div class="font-preview" style="font-family:'Lora',serif;font-size:15px">Karen Viegas</div>
+            <div class="font-name-label">Lora</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-label">Sans-serif</div>
+        <div class="font-list">
+          <div class="font-item" onclick="selectFont(this, 'Montserrat')">
+            <div class="font-preview" style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:300">KAREN VIEGAS</div>
+            <div class="font-name-label">Montserrat Light</div>
+          </div>
+          <div class="font-item" onclick="selectFont(this, 'Raleway')">
+            <div class="font-preview" style="font-family:'Raleway',sans-serif;font-size:14px;letter-spacing:3px">KAREN</div>
+            <div class="font-name-label">Raleway</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CANVAS AREA -->
+  <div class="canvas-area">
+    <div class="canvas-bg-dots"></div>
+
+    <!-- TOOLBAR CONTEXTUAL -->
+    <div class="toolbar visible" id="toolbar">
+      <span class="toolbar-label">Texto</span>
+      <div class="toolbar-sep"></div>
+      <select class="toolbar-font-select" onchange="selectFontFromToolbar(this.value)">
+        <option value="Great Vibes" selected>Great Vibes</option>
+        <option value="Dancing Script">Dancing Script</option>
+        <option value="Playfair Display">Playfair Display</option>
+        <option value="Montserrat">Montserrat</option>
+      </select>
+      <input class="toolbar-size-input" type="number" value="38" min="10" max="100" onchange="updateFontSize(this.value)">
+      <div class="toolbar-sep"></div>
+      <div class="toolbar-color-dot" style="background:#c8a960" onclick="showToast('Cor do texto', 'Abrindo color picker')"></div>
+      <div class="toolbar-sep"></div>
+      <button class="icon-btn" title="Negrito" style="font-weight:700">B</button>
+      <button class="icon-btn" title="Itálico" style="font-style:italic">I</button>
+      <div class="toolbar-sep"></div>
+      <button class="icon-btn" title="Trazer para frente" onclick="showToast('Camadas', 'Elemento movido para frente')">▲</button>
+      <button class="icon-btn" title="Enviar para trás" onclick="showToast('Camadas', 'Elemento movido para trás')">▼</button>
+      <div class="toolbar-sep"></div>
+      <button class="icon-btn" title="Deletar" style="color:#e05252" onclick="showToast('Removido', 'Elemento deletado')">🗑</button>
+    </div>
+
+    <!-- AGENDA CANVAS -->
+    <div class="agenda-canvas" id="agendaCanvas">
+
+      <!-- Fundo -->
+      <div class="agenda-bg"></div>
+      <div class="floral-top-left"></div>
+      <div class="floral-bottom-right"></div>
+
+      <!-- SVG flores decorativas -->
+      <svg class="flowers-svg" viewBox="0 0 340 480" xmlns="http://www.w3.org/2000/svg">
+        <!-- Flores canto superior esquerdo -->
+        <g opacity="0.7">
+          <circle cx="30" cy="30" r="18" fill="#8b2020" opacity="0.6"/>
+          <circle cx="20" cy="45" r="14" fill="#a02828" opacity="0.5"/>
+          <circle cx="50" cy="20" r="12" fill="#6b1515" opacity="0.5"/>
+          <circle cx="15" cy="20" r="10" fill="#c03030" opacity="0.4"/>
+          <!-- Centro da flor -->
+          <circle cx="32" cy="32" r="5" fill="#4a0f0f" opacity="0.8"/>
+          <!-- Folhas -->
+          <ellipse cx="65" cy="55" rx="20" ry="8" fill="#2d5e1e" opacity="0.5" transform="rotate(-30 65 55)"/>
+          <ellipse cx="55" cy="70" rx="22" ry="7" fill="#1e4a14" opacity="0.4" transform="rotate(20 55 70)"/>
+        </g>
+        <!-- Rosa menor -->
+        <g opacity="0.6" transform="translate(70,10)">
+          <circle cx="0" cy="0" r="12" fill="#7b1818" opacity="0.5"/>
+          <circle cx="-8" cy="8" r="9" fill="#8b2020" opacity="0.4"/>
+          <circle cx="8" cy="8" r="9" fill="#6b1515" opacity="0.4"/>
+          <circle cx="0" cy="0" r="4" fill="#3d0a0a" opacity="0.7"/>
+        </g>
+
+        <!-- Flores canto inferior direito -->
+        <g opacity="0.7" transform="translate(260,370)">
+          <circle cx="40" cy="70" r="20" fill="#8b2020" opacity="0.6"/>
+          <circle cx="55" cy="55" r="16" fill="#a02828" opacity="0.5"/>
+          <circle cx="25" cy="60" r="14" fill="#6b1515" opacity="0.5"/>
+          <circle cx="50" cy="75" r="12" fill="#c03030" opacity="0.4"/>
+          <circle cx="42" cy="68" r="6" fill="#4a0f0f" opacity="0.8"/>
+          <!-- Folhas -->
+          <ellipse cx="15" cy="45" rx="22" ry="7" fill="#2d5e1e" opacity="0.5" transform="rotate(40 15 45)"/>
+          <ellipse cx="5" cy="55" rx="20" ry="7" fill="#1e4a14" opacity="0.4" transform="rotate(-20 5 55)"/>
+        </g>
+
+        <!-- Linha dourada decorativa -->
+        <line x1="20" y1="130" x2="20" y2="350" stroke="#c8a960" stroke-width="0.5" opacity="0.3"/>
+        <line x1="320" y1="130" x2="320" y2="350" stroke="#c8a960" stroke-width="0.5" opacity="0.3"/>
+        <line x1="60" y1="15" x2="280" y2="15" stroke="#c8a960" stroke-width="0.5" opacity="0.3"/>
+        <line x1="60" y1="465" x2="280" y2="465" stroke="#c8a960" stroke-width="0.5" opacity="0.3"/>
+
+        <!-- Ornamento central superior -->
+        <path d="M140,25 Q170,18 200,25" stroke="#c8a960" stroke-width="0.8" fill="none" opacity="0.5"/>
+        <path d="M140,455 Q170,462 200,455" stroke="#c8a960" stroke-width="0.8" fill="none" opacity="0.5"/>
+      </svg>
+
+      <!-- Texto fixo do template -->
+      <div class="agenda-fixed-text" style="top:72%;left:50%;transform:translate(-50%,-50%)">
+        <div class="agenda-year">AGENDA</div>
+        <div class="agenda-title-fixed">2026</div>
+      </div>
+
+      <!-- ELEMENTO DRAGGABLE: Logo -->
+      <div class="draggable selected" id="logo-element"
+           style="left: 134px; top: 52px;"
+           onmousedown="startDrag(event, 'logo-element')"
+           onclick="selectElement('logo-element', 'Imagem')">
+        <div class="drag-handle">🖼 Logo</div>
+        <div class="user-logo" id="user-logo-display">⚕️</div>
+        <div class="resize-handles">
+          <div class="resize-handle tl"></div>
+          <div class="resize-handle tr"></div>
+          <div class="resize-handle bl"></div>
+          <div class="resize-handle br"></div>
+          <div class="resize-handle tm"></div>
+          <div class="resize-handle bm"></div>
+          <div class="resize-handle ml"></div>
+          <div class="resize-handle mr"></div>
+        </div>
+      </div>
+
+      <!-- ELEMENTO DRAGGABLE: Nome -->
+      <div class="draggable" id="name-element"
+           style="left: 50px; top: 155px;"
+           onmousedown="startDrag(event, 'name-element')"
+           ondblclick="editName()"
+           onclick="selectElement('name-element', 'Texto')">
+        <div class="drag-handle">✍ Nome</div>
+        <div class="user-name" id="user-name-display">Karen Viegas</div>
+        <div class="resize-handles">
+          <div class="resize-handle tl"></div>
+          <div class="resize-handle tr"></div>
+          <div class="resize-handle bl"></div>
+          <div class="resize-handle br"></div>
+          <div class="resize-handle ml"></div>
+          <div class="resize-handle mr"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ZOOM CONTROLS -->
+    <div class="zoom-controls">
+      <button class="icon-btn" onclick="zoom(-10)">−</button>
+      <div class="zoom-text" id="zoom-display">100%</div>
+      <button class="icon-btn" onclick="zoom(10)">+</button>
+      <div style="width:1px;height:16px;background:#2d2d3d;margin:0 4px"></div>
+      <button class="icon-btn" onclick="resetZoom()" title="Ajustar tela">⊡</button>
+    </div>
+  </div>
+
+  <!-- INFO PANEL (direita) -->
+  <div class="info-panel">
+
+    <div>
+      <div class="info-section-title">Camadas</div>
+      <div class="layer-item" onclick="selectElement('logo-element', 'Imagem')">
+        <div class="layer-icon">🖼️</div>
+        <div>Logo (⚕️)</div>
+        <div style="margin-left:auto;display:flex;gap:4px">
+          <span style="font-size:10px;color:#68d391">●</span>
+        </div>
+      </div>
+      <div class="layer-item active" onclick="selectElement('name-element', 'Texto')">
+        <div class="layer-icon">✍️</div>
+        <div>Nome</div>
+        <div style="margin-left:auto;display:flex;gap:4px">
+          <span style="font-size:10px;color:#68d391">●</span>
+        </div>
+      </div>
+      <div class="layer-item" style="opacity:0.5;cursor:default">
+        <div class="layer-icon">🖼️</div>
+        <div>Template (fundo)</div>
+        <div class="layer-lock">🔒</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div class="info-section-title">Propriedades</div>
+      <div class="prop-row">
+        <div class="prop-label">Elemento</div>
+        <div class="prop-value" id="prop-element">Nome</div>
+      </div>
+      <div class="prop-row">
+        <div class="prop-label">Fonte</div>
+        <div class="prop-value" id="prop-font">Great Vibes</div>
+      </div>
+      <div class="prop-row">
+        <div class="prop-label">Tamanho</div>
+        <div class="prop-value" id="prop-size">38px</div>
+      </div>
+      <div class="prop-row">
+        <div class="prop-label">Cor</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div id="prop-color-dot" style="width:14px;height:14px;border-radius:50%;background:#c8a960;border:1px solid rgba(255,255,255,0.2)"></div>
+          <div class="prop-value" id="prop-color">#c8a960</div>
+        </div>
+      </div>
+      <div class="prop-row" style="border:none">
+        <div class="prop-label">Posição</div>
+        <div class="prop-value" id="prop-pos">50, 155</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div class="info-section-title">Progresso</div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progress-bar" style="width:35%"></div>
+      </div>
+      <div class="progress-label">
+        <span>Personalização</span>
+        <span id="progress-pct">35%</span>
+      </div>
+      <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;">
+          <span style="color:#68d391">✓</span>
+          <span style="color:#94a3b8">Template selecionado</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;">
+          <span style="color:#68d391">✓</span>
+          <span style="color:#94a3b8">Logo carregado</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;">
+          <span style="color:#68d391">✓</span>
+          <span style="color:#94a3b8">Nome personalizado</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;">
+          <span style="color:#4a5568">○</span>
+          <span style="color:#4a5568">Configurar miolo</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:11px;">
+          <span style="color:#4a5568">○</span>
+          <span style="color:#4a5568">Ver preview 3D</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div>
+      <div class="info-section-title">Template</div>
+      <div style="font-size:11px;color:#94a3b8;line-height:1.6;">
+        <div style="font-weight:600;color:#e2e8f0;margin-bottom:4px">Floral Marsalla</div>
+        <div style="color:#64748b">Categoria: Feminina</div>
+        <div style="color:#64748b;margin-top:8px">Resolução de impressão:</div>
+        <div style="color:#c8a960;font-weight:600">2480 × 3508 px (300 dpi)</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-title" id="toast-title"></div>
+  <div class="toast-msg" id="toast-msg"></div>
+</div>
+
+<script>
+  // ===== DRAG & DROP =====
+  let dragEl = null;
+  let dragStartX, dragStartY, elStartLeft, elStartTop;
+  let selectedEl = null;
+  let zoomLevel = 100;
+
+  function startDrag(e, elId) {
+    if (e.target.classList.contains('resize-handle')) return;
+    e.preventDefault();
+    dragEl = document.getElementById(elId);
+    selectElement(elId, elId === 'logo-element' ? 'Imagem' : 'Texto');
+
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    elStartLeft = parseInt(dragEl.style.left) || 0;
+    elStartTop = parseInt(dragEl.style.top) || 0;
+
+    document.addEventListener('mousemove', onDrag);
+    document.addEventListener('mouseup', stopDrag);
+  }
+
+  function onDrag(e) {
+    if (!dragEl) return;
+    const dx = e.clientX - dragStartX;
+    const dy = e.clientY - dragStartY;
+    const newLeft = Math.max(0, Math.min(300, elStartLeft + dx));
+    const newTop = Math.max(0, Math.min(440, elStartTop + dy));
+    dragEl.style.left = newLeft + 'px';
+    dragEl.style.top = newTop + 'px';
+    document.getElementById('prop-pos').textContent = Math.round(newLeft) + ', ' + Math.round(newTop);
+  }
+
+  function stopDrag() {
+    dragEl = null;
+    document.removeEventListener('mousemove', onDrag);
+    document.removeEventListener('mouseup', stopDrag);
+    updateProgress();
+  }
+
+  // ===== SELECT ELEMENT =====
+  function selectElement(elId, label) {
+    document.querySelectorAll('.draggable').forEach(el => el.classList.remove('selected'));
+    const el = document.getElementById(elId);
+    if (el) el.classList.add('selected');
+    selectedEl = elId;
+    document.getElementById('prop-element').textContent = label;
+
+    const toolbar = document.getElementById('toolbar');
+    toolbar.classList.add('visible');
+  }
+
+  // Click fora = deselect
+  document.getElementById('agendaCanvas').addEventListener('click', function(e) {
+    if (e.target === this || e.target.classList.contains('agenda-bg') ||
+        e.target.classList.contains('agenda-fixed-text') ||
+        e.target.classList.contains('agenda-year') ||
+        e.target.classList.contains('agenda-title-fixed')) {
+      document.querySelectorAll('.draggable').forEach(el => el.classList.remove('selected'));
+      selectedEl = null;
+    }
+  });
+
+  // ===== SWITCH PANEL =====
+  function switchPanel(panel) {
+    const panels = ['templates', 'text', 'logo', 'fonts'];
+    panels.forEach(p => {
+      const el = document.getElementById('panel-' + p);
+      const icon = document.getElementById('icon-' + p);
+      if (el) el.style.display = p === panel ? 'block' : 'none';
+      if (icon) icon.classList.toggle('active', p === panel);
+    });
+  }
+
+  // ===== SELECT TEMPLATE =====
+  function selectTemplate(el, name) {
+    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    showToast('Template selecionado', 'Carregando ' + name + '...');
+    updateProgress();
+  }
+
+  // ===== UPDATE NAME =====
+  function updateName(val) {
+    const display = document.getElementById('user-name-display');
+    display.textContent = val || 'Seu Nome';
+    updateProgress();
+  }
+
+  function editName() {
+    switchPanel('text');
+    const input = document.getElementById('name-input');
+    input.focus();
+    input.select();
+    showToast('Editando nome', 'Digite diretamente no painel lateral');
+  }
+
+  // ===== FONT SIZE =====
+  function updateFontSize(val) {
+    document.getElementById('user-name-display').style.fontSize = val + 'px';
+    document.getElementById('font-size-value').textContent = val;
+    document.getElementById('prop-size').textContent = val + 'px';
+    const slider = document.getElementById('font-size-slider');
+    if (slider) slider.value = val;
+  }
+
+  // ===== COLOR =====
+  function selectColor(el, color) {
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('user-name-display').style.color = color;
+    document.getElementById('prop-color').textContent = color;
+    document.getElementById('prop-color-dot').style.background = color;
+    // Update toolbar color dot
+    document.querySelector('.toolbar-color-dot').style.background = color;
+  }
+
+  // ===== SELECT FONT =====
+  function selectFont(el, fontName) {
+    document.querySelectorAll('.font-item').forEach(f => f.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('user-name-display').style.fontFamily = "'" + fontName + "', cursive";
+    document.getElementById('prop-font').textContent = fontName;
+    showToast('Fonte aplicada', fontName);
+  }
+
+  function selectFontFromToolbar(fontName) {
+    document.getElementById('user-name-display').style.fontFamily = "'" + fontName + "', cursive";
+    document.getElementById('prop-font').textContent = fontName;
+  }
+
+  // ===== LOGO SIZE =====
+  function updateLogoSize(val) {
+    const logo = document.getElementById('user-logo-display');
+    logo.style.width = val + 'px';
+    logo.style.height = val + 'px';
+    logo.style.fontSize = Math.round(val * 0.4) + 'px';
+    document.getElementById('logo-size-value').textContent = val;
+  }
+
+  function removeLogo() {
+    document.getElementById('logo-element').style.display = 'none';
+    showToast('Logo removido', 'Você pode fazer upload de uma nova imagem');
+  }
+
+  // ===== ZOOM =====
+  function zoom(delta) {
+    zoomLevel = Math.max(50, Math.min(200, zoomLevel + delta));
+    document.getElementById('zoom-display').textContent = zoomLevel + '%';
+    const canvas = document.getElementById('agendaCanvas');
+    canvas.style.transform = 'scale(' + (zoomLevel / 100) + ')';
+  }
+
+  function resetZoom() {
+    zoomLevel = 100;
+    document.getElementById('zoom-display').textContent = '100%';
+    document.getElementById('agendaCanvas').style.transform = 'scale(1)';
+  }
+
+  // ===== PROGRESS =====
+  function updateProgress() {
+    const checks = [
+      document.querySelector('.template-card.selected') !== null,
+      document.getElementById('logo-element').style.display !== 'none',
+      document.getElementById('user-name-display').textContent !== 'Seu Nome',
+    ];
+    const done = checks.filter(Boolean).length;
+    const pct = Math.round((done / 5) * 100) + 35;
+    const capped = Math.min(pct, 65);
+    document.getElementById('progress-bar').style.width = capped + '%';
+    document.getElementById('progress-pct').textContent = capped + '%';
+  }
+
+  // ===== TOAST =====
+  let toastTimeout;
+  function showToast(title, msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toast-title').textContent = title;
+    document.getElementById('toast-msg').textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  // Init
+  selectElement('name-element', 'Texto');
+</script>
+</body>
+</html>
