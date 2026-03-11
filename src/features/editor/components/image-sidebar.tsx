@@ -1,8 +1,12 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Upload, X } from 'lucide-react';
+
+const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml'];
+const MAX_SIZE_BYTES = 5 * 1024 * 1024;
 
 interface ImageSidebarProps {
   onLogoUpload: (url: string) => void;
@@ -15,6 +19,11 @@ export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!ALLOWED_TYPES.includes(file.type) || file.size > MAX_SIZE_BYTES) {
+      toast.error('Use PNG, JPG ou SVG. Máximo 5MB.');
+      return;
+    }
 
     // Resize client-side before upload (max 2000px)
     const reader = new FileReader();
@@ -63,7 +72,7 @@ export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/png,image/jpeg,image/svg+xml"
         onChange={handleFileChange}
         className="hidden"
       />
@@ -100,7 +109,7 @@ export function ImageSidebar({ onLogoUpload }: ImageSidebarProps) {
         >
           <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
           <p className="text-sm text-gray-600">Clique para fazer upload</p>
-          <p className="text-xs text-gray-400 mt-1">PNG, JPG até 10MB</p>
+          <p className="text-xs text-gray-400 mt-1">PNG, JPG ou SVG. Máximo 5MB.</p>
         </button>
       )}
     </div>
