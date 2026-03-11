@@ -46,6 +46,7 @@ export function Editor({ template }: EditorProps) {
     exportHighRes,
     getExportDataUrl,
     getEditorState,
+    nameTextValue,
     zoomLevel,
     zoomIn,
     zoomOut,
@@ -102,6 +103,9 @@ export function Editor({ template }: EditorProps) {
     }
   }, [getExportDataUrl, getEditorState, logoUrl, savedDesignId, saveDesign, template.id]);
 
+  const canGoNext =
+    nameTextValue !== 'Seu Nome' && nameTextValue.trim() !== '';
+
   useEffect(() => {
     if (!canvas || !saveState) return;
     const handler = () => saveState();
@@ -151,6 +155,7 @@ export function Editor({ template }: EditorProps) {
         onZoomReset={zoomReset}
         onSave={onSave}
         savedDesignId={savedDesignId}
+        canGoNext={canGoNext}
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar

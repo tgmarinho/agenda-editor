@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Download, ShoppingCart, ArrowLeft, Undo2, Redo2, Minus, Plus, Save } from 'lucide-react';
+import { Download, ShoppingCart, ArrowLeft, Undo2, Redo2, Minus, Plus, Save, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 interface NavbarProps {
@@ -19,6 +20,7 @@ interface NavbarProps {
   onZoomReset: () => void;
   onSave?: () => Promise<string | null>;
   savedDesignId?: string | null;
+  canGoNext?: boolean;
 }
 
 export function Navbar({
@@ -35,8 +37,11 @@ export function Navbar({
   onZoomReset,
   onSave,
   savedDesignId = null,
+  canGoNext = false,
 }: NavbarProps) {
+  const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+  const [isGoingNext, setIsGoingNext] = useState(false);
 
   const handleSave = async () => {
     if (!onSave) return;
@@ -45,6 +50,21 @@ export function Navbar({
       await onSave();
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleNext = async () => {
+    if (savedDesignId) {
+      router.push(`/configurar/${savedDesignId}`);
+      return;
+    }
+    if (!onSave) return;
+    setIsGoingNext(true);
+    try {
+      const id = await onSave();
+      if (id) router.push(`/configurar/${id}`);
+    } finally {
+      setIsGoingNext(false);
     }
   };
 
@@ -119,6 +139,23 @@ export function Navbar({
               <>
                 <Save className="w-4 h-4 mr-1" />
                 Salvar Design
+              </>
+            )}
+          </Button>
+        )}
+        {onSave && (
+          <Button
+            size="sm"
+            className="bg-primary text-white"
+            disabled={!canGoNext || isGoingNext}
+            onClick={handleNext}
+          >
+            {isGoingNext ? (
+              <>Aguarde…</>
+            ) : (
+              <>
+                Próximo
+                <ArrowRight className="w-4 h-4 ml-1" />
               </>
             )}
           </Button>

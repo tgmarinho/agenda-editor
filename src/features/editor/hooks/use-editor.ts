@@ -37,6 +37,7 @@ export function useEditor(template: AgendaTemplate | null) {
   const [nameFontStyle, setNameFontStyle] = useState<string>('normal');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [logoObject, setLogoObject] = useState<any>(null);
+  const [nameTextValue, setNameTextValue] = useState<string>('Seu Nome');
   const [isLoading, setIsLoading] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [hasSelection, setHasSelection] = useState(false);
@@ -96,6 +97,7 @@ export function useEditor(template: AgendaTemplate | null) {
       if (target?.get?.('data') && (target.get('data') as { editorRole?: string })?.editorRole === 'name') {
         setNameFontWeight((target.get('fontWeight') as string) ?? 'normal');
         setNameFontStyle((target.get('fontStyle') as string) ?? 'normal');
+        setNameTextValue((target.get('text') as string) ?? 'Seu Nome');
       }
       debouncedPersist();
     };
@@ -117,6 +119,7 @@ export function useEditor(template: AgendaTemplate | null) {
             setNameObject(nameObj);
             setNameFontWeight((nameObj.get('fontWeight') as string) ?? 'normal');
             setNameFontStyle((nameObj.get('fontStyle') as string) ?? 'normal');
+            setNameTextValue((nameObj.get('text') as string) ?? 'Seu Nome');
           }
           if (logoObj) setLogoObject(logoObj);
           isRestoringRef.current = false;
@@ -199,6 +202,7 @@ export function useEditor(template: AgendaTemplate | null) {
         setNameObject(nameText);
         setNameFontWeight((nameText.get('fontWeight') as string) ?? 'normal');
         setNameFontStyle((nameText.get('fontStyle') as string) ?? 'normal');
+        setNameTextValue('Seu Nome');
 
         setCanvas(fabricCanvas);
         setIsLoading(false);
@@ -306,6 +310,7 @@ export function useEditor(template: AgendaTemplate | null) {
   const updateNameText = useCallback((text: string) => {
     if (!nameObject) return;
     nameObject.set('text', text);
+    setNameTextValue(text);
     canvas?.renderAll();
   }, [nameObject, canvas]);
 
@@ -397,5 +402,6 @@ export function useEditor(template: AgendaTemplate | null) {
     zoomIn,
     zoomOut,
     zoomReset,
+    nameTextValue,
   };
 }
