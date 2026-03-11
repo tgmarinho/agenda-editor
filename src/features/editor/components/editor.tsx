@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { type AgendaTemplate } from '@/types/template';
 import { useEditor } from '../hooks/use-editor';
+import { useHistory } from '../hooks/use-history';
 import { useFontLoader } from '../hooks/use-font-loader';
 import { Sidebar } from './sidebar';
 import { Navbar } from './navbar';
@@ -18,6 +19,7 @@ export function Editor({ template }: EditorProps) {
   const { fontsLoaded } = useFontLoader();
   const {
     canvasRef,
+    canvas,
     isLoading,
     addLogo,
     addText,
@@ -33,6 +35,20 @@ export function Editor({ template }: EditorProps) {
     updateNameFontStyle,
     exportHighRes,
   } = useEditor(template);
+  const { undo, redo, canUndo, canRedo, saveState } = useHistory(canvas);
+
+  useEffect(() => {
+    if (!canvas || !saveState) return;
+    const handler = () => saveState();
+    canvas.on('object:modified', handler);
+    canvas.on('object:added', handler);
+    canvas.on('object:removed', handler);
+    return () => {
+      canvas.off('object:modified', handler);
+      canvas.off('object:added', handler);
+      canvas.off('object:removed', handler);
+    };
+  }, [canvas, saveState]);
 
   return (
     <div className="flex flex-col h-screen bg-gray-100">
@@ -41,6 +57,10 @@ export function Editor({ template }: EditorProps) {
         onExport={exportHighRes}
         templateName={template.name}
         price={template.price}
+        onUndo={undo}
+        onRedo={redo}
+        canUndo={canUndo}
+        canRedo={canRedo}
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar

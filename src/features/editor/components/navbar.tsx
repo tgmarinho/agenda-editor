@@ -1,16 +1,36 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Download, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { Download, ShoppingCart, ArrowLeft, Undo2, Redo2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface NavbarProps {
   onExport: () => void;
   templateName: string;
   price: number;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
-export function Navbar({ onExport, templateName, price }: NavbarProps) {
+export function Navbar({ onExport, templateName, price, onUndo, onRedo, canUndo, canRedo }: NavbarProps) {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'z') {
+        e.preventDefault();
+        onUndo();
+      }
+      if (e.ctrlKey && e.key === 'y') {
+        e.preventDefault();
+        onRedo();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onUndo, onRedo]);
+
   const priceFormatted = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -28,6 +48,12 @@ export function Navbar({ onExport, templateName, price }: NavbarProps) {
         <span className="text-sm font-medium text-gray-700">{templateName}</span>
       </div>
       <div className="flex items-center gap-2">
+        <Button variant="outline" size="sm" onClick={onUndo} disabled={!canUndo} title="Desfazer (Ctrl+Z)">
+          <Undo2 className="w-4 h-4" />
+        </Button>
+        <Button variant="outline" size="sm" onClick={onRedo} disabled={!canRedo} title="Refazer (Ctrl+Y)">
+          <Redo2 className="w-4 h-4" />
+        </Button>
         <Button variant="outline" size="sm" onClick={onExport}>
           <Download className="w-4 h-4 mr-1" />
           Exportar PNG
