@@ -29,6 +29,7 @@ export const saveDesignSchema = z.object({
   editorState: z.any(),
   userImageUrl: z.string().url().optional(),
   previewImageUrl: z.string().optional(),
+  exportImageUrl: z.string().url().optional(),
 });
 
 export const agendaConfigSchema = z.object({
