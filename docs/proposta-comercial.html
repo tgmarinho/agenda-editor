@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proposta Comercial — Sistema de Personalização de Agendas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --ink-muted: #4a4a4a;
+      --ink-light: #6b6b6b;
+      --accent: #8b6914;
+      --accent-soft: #c9a227;
+      --paper: #fafaf9;
+      --border: #e5e3df;
+      --table-header: #f3f2ef;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 11pt;
+      line-height: 1.55;
+      color: var(--ink);
+      background: var(--paper);
+      margin: 0;
+      padding: 0 2rem 3rem;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    h1, h2, h3 {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 700;
+      margin-top: 0;
+      color: var(--ink);
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      letter-spacing: 0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      margin-bottom: 0.5rem;
+      margin-top: 2rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid var(--border);
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+      margin-top: 1.25rem;
+      page-break-after: avoid;
+    }
+
+    .subtitle {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: 1.15rem;
+      color: var(--ink-muted);
+      margin-bottom: 2rem;
+    }
+
+    /* .cover {
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem 0 4rem;
+      page-break-after: always;
+    } */
+
+    .cover-meta {
+      margin-top: 3rem;
+      font-size: 0.95rem;
+      color: var(--ink-muted);
+    }
+
+    .cover-meta p {
+      margin: 0.35rem 0;
+    }
+
+    .cover-meta strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .divider-accent {
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-soft));
+      margin: 1.75rem 0;
+      max-width: 120px;
+    }
+
+    ul, ol {
+      margin: 0.5rem 0 1rem;
+      padding-left: 1.35rem;
+    }
+
+    li {
+      margin-bottom: 0.35rem;
+    }
+
+    li ul {
+      margin-top: 0.35rem;
+      margin-bottom: 0.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 0.75rem 0 1.25rem;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      padding: 0.5rem 0.65rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--table-header);
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    td {
+      color: var(--ink-muted);
+    }
+
+    td strong {
+      color: var(--ink);
+    }
+
+    blockquote {
+      margin: 1rem 0;
+      padding: 0.75rem 1rem;
+      background: var(--table-header);
+      border-left: 3px solid var(--accent);
+      font-style: italic;
+      color: var(--ink-muted);
+      font-size: 0.95rem;
+    }
+
+    .highlight-box {
+      background: #fdfcf9;
+      border: 1px solid var(--border);
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+      border-radius: 2px;
+    }
+
+    .steps {
+      list-style: none;
+      padding-left: 0;
+      counter-reset: step;
+    }
+
+    .steps li {
+      counter-increment: step;
+      padding-left: 2rem;
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      width: 1.4rem;
+      height: 1.4rem;
+      background: var(--accent);
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-family: 'Source Sans 3', sans-serif;
+    }
+
+    .footer-note {
+      margin-top: 2.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.9rem;
+      color: var(--ink-light);
+    }
+
+    .footer-note p {
+      margin: 0.25rem 0;
+    }
+
+    /* Print */
+    @media print {
+      body {
+        background: white;
+        padding: 0.8rem 1rem 1.5rem;
+        font-size: 10.5pt;
+      }
+
+      .cover {
+        min-height: auto;
+        padding: 1rem 0 2rem;
+      }
+
+      h2 {
+        margin-top: 1.5rem;
+      }
+
+      .divider-accent {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      th {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .steps li::before {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      blockquote {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      a {
+        color: var(--ink);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="">
+    <div class="divider-accent"></div>
+    <h1>Proposta Comercial</h1>
+    <p class="subtitle">Sistema de Personalização de Agendas Online</p>
+    <div class="divider" style="margin: 1rem 0;"></div>
+    <div class="cover-meta">
+      <p><strong>Para:</strong> Débora Leite</p>
+      <p><strong>De:</strong> Thiago Marinho — TG DEV</p>
+      <p><strong>Data:</strong> Março de 2026</p>
+      <p><strong>Validade:</strong> 15 dias</p>
+    </div>
+  </header>
+
+  <main>
+    <h2>Resumo Executivo</h2>
+    <p>Desenvolvimento de uma plataforma web completa para venda de agendas personalizadas, onde o cliente final escolhe um template, faz upload do seu logo, digita seu nome e configura o miolo — tudo em um editor visual intuitivo, com preview 3D animado e pagamento via Pix.</p>
+
+    <h2>O que será entregue</h2>
+
+    <h3>Etapa 1 — Editor da Capa (Fabric.js)</h3>
+    <ul>
+      <li>Catálogo de templates com filtro por categoria (Feminina, Masculina, Profissional, Elegante)</li>
+      <li>Editor visual drag-and-drop da capa:
+        <ul>
+          <li>Upload de logo/imagem pessoal (arrastar, redimensionar, rotacionar)</li>
+          <li>Campo de nome com posicionamento livre (arrastar)</li>
+          <li>Seleção de fonte (8 fontes decorativas: Great Vibes, Dancing Script, Playfair Display, Lora, Montserrat, Raleway, Pacifico, Satisfy)</li>
+          <li>Seleção de cor do nome (paleta com presets + cor personalizada)</li>
+          <li>Controle de tamanho da fonte</li>
+        </ul>
+      </li>
+      <li>Posições sugeridas por template como ponto de partida</li>
+      <li>Undo/Redo (desfazer/refazer ações)</li>
+      <li>Auto-save do design no banco de dados</li>
+      <li>Export da capa em alta resolução (2480×3508px — A4 300dpi)</li>
+    </ul>
+
+    <h3>Etapa 2 — Configurador do Miolo</h3>
+    <p>Formulário com seletores visuais para:</p>
+    <table>
+      <thead>
+        <tr><th>Opção</th><th>Escolhas disponíveis</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Tipo de miolo</td><td>Comercial / Clássica / Jurídica</td></tr>
+        <tr><td>Dias por página</td><td>1DPP (1 dia por página) / 2DPP (2 dias por página)</td></tr>
+        <tr><td>Posição do calendário</td><td>Lateral / Rodapé</td></tr>
+        <tr><td>Cor das linhas/escritas</td><td>Varia por tipo (Comercial: cinza; Clássica: azul, amarelo, cinza, verde; Jurídica: azul, cinza, verde)</td></tr>
+        <tr><td>Cor do espiral</td><td>Prata, Dourado, Preto, Branco, Rosa</td></tr>
+      </tbody>
+    </table>
+    <ul>
+      <li>Preview estático do miolo atualiza em tempo real conforme as seleções</li>
+      <li>Validação: cores disponíveis filtradas automaticamente pelo tipo de miolo</li>
+    </ul>
+
+    <h3>Etapa 3 — Preview 3D (Flipbook)</h3>
+    <ul>
+      <li>Visualização animada da agenda completa, simulando folhear real</li>
+      <li>Sequência: capa personalizada, folha de rosto, dados pessoais, calendário 2026, 4–5 páginas de dias (1DPP ou 2DPP)</li>
+      <li>Suporte a swipe/toque no mobile</li>
+      <li>Botão "Comprar esta agenda" dentro do preview</li>
+    </ul>
+
+    <h3>Etapa 4 — Checkout e Pagamento</h3>
+    <ul>
+      <li>Cadastro/login do cliente final (Supabase Auth)</li>
+      <li>Formulário de endereço de entrega</li>
+      <li>Resumo do pedido (miniatura da capa + configuração do miolo)</li>
+      <li>Geração de QR Code Pix via Asaas</li>
+      <li>Webhook de confirmação de pagamento automático</li>
+      <li>Atualização automática de status do pedido</li>
+    </ul>
+
+    <h3>Etapa 5 — Painel Administrativo</h3>
+    <ul>
+      <li>Lista de todos os pedidos com filtro por status</li>
+      <li>Visualização detalhada: preview da capa em alta resolução (download PNG 2480×3508px), configuração completa do miolo</li>
+      <li>Gerenciamento de templates (cadastrar, ativar/desativar, reordenar)</li>
+      <li>Cadastro de tipos de miolo e cores de espiral (seeds iniciais incluídos)</li>
+    </ul>
+
+    <h3>Etapa 6 — Comunicação e Emails</h3>
+    <ul>
+      <li>Email automático de confirmação de pedido ao cliente (Resend)</li>
+      <li>Email com resumo do pedido para o administrador</li>
+      <li>Status de pedido: <strong>Aguardando Pagamento → Pago → Em Produção → Enviado → Entregue</strong></li>
+    </ul>
+
+    <h3>Funcionalidades gerais</h3>
+    <ul>
+      <li>Sistema responsivo (mobile-first)</li>
+      <li>Deploy na Vercel com CI/CD automático</li>
+      <li>Banco de dados PostgreSQL (Supabase)</li>
+      <li>Upload de imagens no Supabase Storage (máx. 10MB, redimensionamento automático client-side)</li>
+      <li>30 dias de suporte pós-entrega (correção de bugs)</li>
+    </ul>
+
+    <h2>O que NÃO está incluso neste escopo</h2>
+    <blockquote>Qualquer funcionalidade abaixo pode ser contratada separadamente.</blockquote>
+    <table>
+      <thead>
+        <tr><th>Fora do escopo</th><th>Motivo</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Design e criação dos templates de capa</td><td>Os arquivos devem ser entregues pelo cliente</td></tr>
+        <tr><td>App mobile nativo (iOS/Android)</td><td>O sistema é web responsivo</td></tr>
+        <tr><td>Integração com transportadoras (Melhor Envio, Correios)</td><td>Cálculo de frete manual</td></tr>
+        <tr><td>Integração com WhatsApp</td><td>Apenas email incluso</td></tr>
+        <tr><td>Painel financeiro com relatórios de vendas</td><td>Dashboard básico de pedidos apenas</td></tr>
+        <tr><td>Sistema de cupons de desconto</td><td>Sprint futuro</td></tr>
+        <tr><td>Checkout com cartão de crédito</td><td>Apenas Pix incluso (Asaas)</td></tr>
+        <tr><td>Multi-tenancy</td><td>Sistema mono-tenant</td></tr>
+        <tr><td>SEO avançado para catálogo</td><td>Estrutura básica de metadados inclusa</td></tr>
+        <tr><td>Testes automatizados (unitários/e2e)</td><td>Testes manuais do fluxo completo</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Responsabilidades do Cliente</h2>
+
+    <h3>Imagens dos Templates (CRÍTICO)</h3>
+    <p>O sistema é desenvolvido para exibir os templates que o cliente fornecer. <strong>Sem os templates, o sistema não tem conteúdo real para funcionar.</strong></p>
+    <table>
+      <thead>
+        <tr><th>Tipo</th><th>Especificação</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Formato</td><td>PNG com fundo (sem transparência)</td></tr>
+        <tr><td>Resolução</td><td><strong>2480 × 3508 pixels</strong> (A4 em 300dpi — padrão gráfica)</td></tr>
+        <tr><td>Cor</td><td>RGB (não CMYK)</td></tr>
+        <tr><td>Tamanho máximo</td><td>20MB por arquivo</td></tr>
+        <tr><td>Thumbnail</td><td>O sistema gera automaticamente a partir do arquivo original</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Mínimo para go-live:</strong> 4 templates (1 por categoria). <strong>Recomendado para lançamento:</strong> 8–12 templates.</p>
+    <blockquote><strong>Importante:</strong> Os templates devem chegar <strong>antes do início da Sprint 2</strong> (semana 2). Atrasos na entrega impactam diretamente o prazo de entrega do sistema.</blockquote>
+
+    <h3>Outras responsabilidades</h3>
+    <ul>
+      <li>Conta ativa no Asaas (sandbox para testes + produção)</li>
+      <li>Domínio registrado (.com.br ou .com)</li>
+      <li>Logo e identidade visual da plataforma (nome, cores, logotipo)</li>
+      <li>Definição dos preços das agendas</li>
+      <li>Definição das cores de espiral disponíveis (quais a gráfica trabalha)</li>
+      <li>Aprovação dos templates de email de confirmação</li>
+    </ul>
+
+    <h2>Investimento</h2>
+    <table>
+      <tbody>
+        <tr><td><strong>Desenvolvimento (valor único)</strong></td><td><strong>R$ 38.000</strong></td></tr>
+        <tr><td>Infraestrutura mensal (recorrente)</td><td>~R$ 330/mês</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Forma de pagamento do desenvolvimento</h3>
+    <table>
+      <thead>
+        <tr><th>Marco</th><th>%</th><th>Valor</th><th>Quando</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Entrada</td><td>30%</td><td>R$ 11.400</td><td>Assinatura do contrato</td></tr>
+        <tr><td>Entrega do editor de capa + catálogo</td><td>30%</td><td>R$ 11.400</td><td>Fim da semana 3</td></tr>
+        <tr><td>Entrega do checkout + admin</td><td>30%</td><td>R$ 11.400</td><td>Fim da semana 5</td></tr>
+        <tr><td>Go-live + aprovação final</td><td>10%</td><td>R$ 3.800</td><td>Deploy em produção</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Custos de infraestrutura (pagos pelo cliente)</h3>
+    <table>
+      <thead>
+        <tr><th>Serviço</th><th>Plano</th><th>Custo/mês</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Vercel (hospedagem)</td><td>Pro</td><td>~R$ 100</td></tr>
+        <tr><td>Supabase (banco + storage + auth)</td><td>Pro</td><td>~R$ 125</td></tr>
+        <tr><td>Resend (emails)</td><td>Pro</td><td>~R$ 100</td></tr>
+        <tr><td>Domínio</td><td>—</td><td>~R$ 5</td></tr>
+        <tr><td><strong>Total mensal</strong></td><td></td><td><strong>~R$ 330</strong></td></tr>
+      </tbody>
+    </table>
+    <p><em>Contas Asaas e Google Fonts são gratuitas no volume inicial.</em></p>
+
+    <h2>Cronograma</h2>
+    <table>
+      <thead>
+        <tr><th>Semana</th><th>Entregas</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1–2</td><td>Setup do projeto, banco de dados, catálogo de templates, painel admin de templates</td></tr>
+        <tr><td>2–3</td><td>Editor da capa (Fabric.js): drag, upload de logo, nome, fontes, cores</td></tr>
+        <tr><td>3–4</td><td>Configurador do miolo + preview 3D flipbook + autenticação</td></tr>
+        <tr><td>5</td><td>Checkout com Pix (Asaas) + painel admin de pedidos + emails</td></tr>
+        <tr><td>6</td><td>Responsividade mobile, testes do fluxo completo, deploy em produção</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Prazo total estimado: 6 semanas</strong> a partir da data de início e recebimento da entrada.</p>
+    <p><strong>Prazo para entrega dos templates pelo cliente: até o início da semana 2.</strong></p>
+
+    <h2>Garantias</h2>
+    <ul>
+      <li>Código-fonte entregue ao cliente ao final do projeto</li>
+      <li>30 dias de suporte pós-entrega para correção de bugs</li>
+      <li>Deploy incluído no prazo combinado</li>
+      <li>Reunião semanal de alinhamento (30 min via Google Meet)</li>
+    </ul>
+
+    <h2>Próximos passos</h2>
+    <ol class="steps">
+      <li>Aprovação desta proposta</li>
+      <li>Assinatura de contrato</li>
+      <li>Pagamento da entrada (R$ 11.400)</li>
+      <li>Kick-off: definição das credenciais dos serviços, entrega dos templates</li>
+      <li>Início do desenvolvimento</li>
+    </ol>
+
+    <footer class="footer-note">
+      <p><em>Proposta válida por 15 dias a partir da data de emissão.</em></p>
+      <p><strong>Dúvidas?</strong> Entre em contato: tgmarinhopro@gmail.com | (67) 99958-4700</p>
+    </footer>
+  </main>
+</body>
+</html>

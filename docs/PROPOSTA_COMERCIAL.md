@@ -3,8 +3,8 @@
 
 ---
 
-**Para:** [Nome do Cliente]
-**De:** [Seu Nome / Empresa]
+**Para:** Débora Leite
+**De:** Thiago Marinho - TG DEV
 **Data:** Março de 2026
 **Validade:** 15 dias
 
@@ -222,4 +222,4 @@ O sistema é desenvolvido para exibir os templates que o cliente fornecer. **Sem
 ---
 
 *Proposta válida por 15 dias a partir da data de emissão.*
-*Dúvidas? Entre em contato: [seu email] | [seu WhatsApp]*
+*Dúvidas? Entre em contato: tgmarinhopro@gmail.com | 67999584700*
